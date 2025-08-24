@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGSHEET CHILLER PLAN - Mall Living World Grand Wisata</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #1e40af 0%, #3730a3 100%); }
+        .card-shadow { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .logsheet-table { font-size: 11px; }
+        .parameter-cell { min-width: 150px; }
+        .unit-cell { min-width: 80px; }
+        .value-cell { min-width: 60px; text-align: center; }
+        .time-header { font-weight: bold; background: #f3f4f6; }
+        .section-header { background: #e5e7eb; font-weight: bold; }
+        .out-of-range { background-color: #fef2f2; color: #dc2626; font-weight: bold; }
+        .in-range { background-color: #f0fdf4; color: #166534; }
+        @media print {
+            .no-print { display: none; }
+            body { font-size: 9px; }
+            .logsheet-table { font-size: 8px; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="gradient-bg text-white p-6 mb-6 no-print">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-3xl font-bold mb-2">❄️ LOGSHEET CHILLER PLAN</h1>
+            <h2 class="text-xl font-semibold mb-1">MALL LIVING WORLD GRAND WISATA</h2>
+            <p class="text-blue-100">Sistem Monitoring & Pelaporan Data Chiller</p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- Control Panel -->
+        <div class="bg-white rounded-xl card-shadow p-6 mb-6 no-print">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                        <input type="date" id="dateSelect" class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" value="2025-05-15" onchange="updateDateDisplay()">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                        <select id="unitSelect" class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="all">Semua Unit</option>
+                            <option value="unit1">Unit No.1</option>
+                            <option value="unit2">Unit No.2</option>
+                            <option value="unit3">Unit No.3</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="refreshData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        🔄 Refresh Data
+                    </button>
+                    <button onclick="exportLogsheet()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        📊 Export Excel
+                    </button>
+                    <button onclick="printLogsheet()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        🖨️ Print
+                    </button>
+                    <button onclick="inputData()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        ✏️ Input Data
+                    </button>
+                    <button onclick="quickInputMode()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        ⚡ Input Cepat
+                    </button>
+                    <button onclick="backupAllData()" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                        💾 Backup Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 no-print">
+            <div class="bg-white rounded-lg card-shadow p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Unit Beroperasi</p>
+                        <p class="text-2xl font-bold text-green-600" id="operatingUnits">3</p>
+                    </div>
+                    <div class="bg-green-100 p-2 rounded-full">
+                        <span class="text-xl">✅</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg card-shadow p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Parameter Normal</p>
+                        <p class="text-2xl font-bold text-blue-600" id="normalParams">89%</p>
+                    </div>
+                    <div class="bg-blue-100 p-2 rounded-full">
+                        <span class="text-xl">📊</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg card-shadow p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Perlu Perhatian</p>
+                        <p class="text-2xl font-bold text-yellow-600" id="warningParams">7</p>
+                    </div>
+                    <div class="bg-yellow-100 p-2 rounded-full">
+                        <span class="text-xl">⚠️</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg card-shadow p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Avg Load Current</p>
+                        <p class="text-2xl font-bold text-purple-600" id="avgLoad">96.2%</p>
+                    </div>
+                    <div class="bg-purple-100 p-2 rounded-full">
+                        <span class="text-xl">⚡</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Logsheet Table -->
+        <div class="bg-white rounded-xl card-shadow p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">📋 LOGSHEET CHILLER PLAN</h3>
+                    <p class="text-sm text-gray-600">Tanggal: <span id="currentDate">15 Mei 2025</span></p>
+                </div>
+                <div class="text-right text-sm text-gray-600 no-print">
+                    <p>Last Update: <span id="lastUpdate">15:30 WIB</span></p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse border border-gray-300 logsheet-table">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 p-2 text-center">No</th>
+                            <th class="border border-gray-300 p-2 text-center parameter-cell">Description</th>
+                            <th class="border border-gray-300 p-2 text-center">Parameter</th>
+                            <th class="border border-gray-300 p-2 text-center unit-cell">Unit</th>
+                            <th class="border border-gray-300 p-2 text-center time-header" colspan="5">Unit No.1</th>
+                            <th class="border border-gray-300 p-2 text-center time-header" colspan="5">Unit No.2</th>
+                            <th class="border border-gray-300 p-2 text-center time-header" colspan="5">Unit No.3</th>
+                            <th class="border border-gray-300 p-2 text-center">Keterangan</th>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <th class="border border-gray-300 p-1"></th>
+                            <th class="border border-gray-300 p-1"></th>
+                            <th class="border border-gray-300 p-1"></th>
+                            <th class="border border-gray-300 p-1"></th>
+                            <th class="border border-gray-300 p-1 text-xs">09:30</th>
+                            <th class="border border-gray-300 p-1 text-xs">12:00</th>
+                            <th class="border border-gray-300 p-1 text-xs">15:00</th>
+                            <th class="border border-gray-300 p-1 text-xs">18:00</th>
+                            <th class="border border-gray-300 p-1 text-xs">21:00</th>
+                            <th class="border border-gray-300 p-1 text-xs">09:30</th>
+                            <th class="border border-gray-300 p-1 text-xs">12:00</th>
+                            <th class="border border-gray-300 p-1 text-xs">15:00</th>
+                            <th class="border border-gray-300 p-1 text-xs">18:00</th>
+                            <th class="border border-gray-300 p-1 text-xs">21:00</th>
+                            <th class="border border-gray-300 p-1 text-xs">09:30</th>
+                            <th class="border border-gray-300 p-1 text-xs">12:00</th>
+                            <th class="border border-gray-300 p-1 text-xs">15:00</th>
+                            <th class="border border-gray-300 p-1 text-xs">18:00</th>
+                            <th class="border border-gray-300 p-1 text-xs">21:00</th>
+                            <th class="border border-gray-300 p-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsheetTableBody">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Signature Section -->
+        <div class="bg-white rounded-xl card-shadow p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-7 gap-4 text-center">
+                <div class="border border-gray-300 p-4 rounded">
+                    <p class="font-semibold text-sm mb-2">Dibuat Oleh</p>
+                    <div class="h-16 mb-2"></div>
+                    <p class="text-xs">Spv. Engineering</p>
+                </div>
+                <div class="border border-gray-300 p-4 rounded">
+                    <p class="font-semibold text-sm mb-2">Pic Logsheet</p>
+                    <p class="text-xs mb-1">09:30</p>
+                    <div class="h-12 mb-2"></div>
+                </div>
+                <div class="border border-gray-300 p-4 rounded">
+                    <p class="font-semibold text-sm mb-2">Pic Logsheet</p>
+                    <p class="text-xs mb-1">12:00</p>
+                    <div class="h-12 mb-2"></div>
+                </div>
+                <div class="border border-gray-300 p-4 rounded">
+                    <p class="font-semibold text-sm mb-2">Pic Logsheet</p>
+                    <p class="text-xs mb-1">15:00</p>
+                    <div class="h-12 mb-2"></div>
+                </div>
+                <div class="border border-gray-300 p-4 rounded">
+                    <p class="font-semibold text-sm mb-2">Pic Logsheet</p>
+                    <p class="text-xs mb-1">18:00</p>
+                    <div class="h-12 mb-2"></div>
+                </div>
+                <div class="border border-gray-300 p-4 rounded">
+                    <p class="font-semibold text-sm mb-2">Pic Logsheet</p>
+                    <p class="text-xs mb-1">21:00</p>
+                    <div class="h-12 mb-2"></div>
+                </div>
+                <div class="border border-gray-300 p-4 rounded">
+                    <p class="font-semibold text-sm mb-2">Mengetahui</p>
+                    <div class="h-16 mb-2"></div>
+                    <p class="text-xs">Manager Engineering</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Data Modal -->
+    <div id="inputModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl max-w-md w-full p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">Input Data Parameter</h3>
+                    <button onclick="closeInputModal()" class="text-gray-500 hover:text-gray-700">✕</button>
+                </div>
+                <form id="inputForm">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Parameter</label>
+                            <select id="parameterSelect" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                <option value="">Pilih Parameter</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Unit</label>
+                            <select id="unitInput" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                <option value="unit1">Unit No.1</option>
+                                <option value="unit2">Unit No.2</option>
+                                <option value="unit3">Unit No.3</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Waktu</label>
+                            <select id="timeInput" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                <option value="0930">09:30</option>
+                                <option value="1200">12:00</option>
+                                <option value="1500">15:00</option>
+                                <option value="1800">18:00</option>
+                                <option value="2100">21:00</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Nilai</label>
+                            <input type="number" step="0.1" id="valueInput" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="Masukkan nilai">
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" onclick="closeInputModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg">Batal</button>
+                        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Input Modal -->
+    <div id="quickInputModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl max-w-6xl w-full p-6 max-h-screen overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold">⚡ Mode Input Cepat</h3>
+                        <p class="text-sm text-gray-600">Klik langsung pada sel untuk mengedit nilai</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div>
+                            <label class="block text-xs font-medium mb-1">Unit</label>
+                            <select id="quickUnitSelect" class="border border-gray-300 rounded px-2 py-1 text-sm">
+                                <option value="unit1">Unit No.1</option>
+                                <option value="unit2">Unit No.2</option>
+                                <option value="unit3">Unit No.3</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1">Waktu</label>
+                            <select id="quickTimeSelect" class="border border-gray-300 rounded px-2 py-1 text-sm">
+                                <option value="0930">09:30</option>
+                                <option value="1200">12:00</option>
+                                <option value="1500">15:00</option>
+                                <option value="1800">18:00</option>
+                                <option value="2100">21:00</option>
+                            </select>
+                        </div>
+                        <button onclick="closeQuickInputModal()" class="text-gray-500 hover:text-gray-700 text-xl">✕</button>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 p-3 rounded-lg mb-4">
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="bg-blue-600 text-white px-2 py-1 rounded text-xs">Tips:</span>
+                        <span>Pilih Unit dan Waktu di atas, lalu klik nilai yang ingin diubah. Tekan Enter untuk simpan atau Esc untuk batal.</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300 text-sm">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 p-2">No</th>
+                                <th class="border border-gray-300 p-2 min-w-48">Parameter</th>
+                                <th class="border border-gray-300 p-2">Unit</th>
+                                <th class="border border-gray-300 p-2">Range</th>
+                                <th class="border border-gray-300 p-2">Nilai Saat Ini</th>
+                                <th class="border border-gray-300 p-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quickInputTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-between items-center mt-6">
+                    <div class="text-sm text-gray-600">
+                        <span class="inline-block w-4 h-4 bg-green-100 border mr-1"></span> Normal
+                        <span class="inline-block w-4 h-4 bg-red-100 border mr-1 ml-3"></span> Di luar range
+                        <span class="inline-block w-4 h-4 bg-gray-100 border mr-1 ml-3"></span> Belum diisi
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="saveAllQuickInput()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+                            💾 Simpan Semua
+                        </button>
+                        <button onclick="closeQuickInputModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logsheet data structure based on the provided format
+        const logsheetData = [
+            // Condenser Status
+            { no: 1, section: 'Condenser status', description: 'Condenser status', parameter: 'Water In Temp.', unit: '°C', range: '27-31°C', 
+              unit1: { '0930': 29.7, '1200': 29.4, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 29.8, '1200': 29.4, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 29.7, '1200': 29.4, '1500': '', '1800': '', '2100': '' } },
+            { no: 2, section: '', description: '', parameter: 'Water Out Temp.', unit: '°C', range: '32-36°C',
+              unit1: { '0930': 34.4, '1200': 35.1, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 34.4, '1200': 34.6, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 34.4, '1200': 34.9, '1500': '', '1800': '', '2100': '' } },
+            { no: 3, section: '', description: '', parameter: 'Condenser Approach', unit: '°C', range: '<3.3°C',
+              unit1: { '0930': 1.7, '1200': 1.6, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 1.3, '1200': 1.0, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 0.8, '1200': 0.5, '1500': '', '1800': '', '2100': '' } },
+            { no: 4, section: '', description: '', parameter: 'Condenser Pressure', unit: 'Kpa', range: 'Low: >-30 kPa, High: <187 kPa',
+              unit1: { '0930': 88.2, '1200': 89.9, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 84.2, '1200': 84.2, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 81.7, '1200': 82.9, '1500': '', '1800': '', '2100': '' } },
+            { no: 5, section: '', description: '', parameter: 'Condenser Saturated Temp.', unit: '°C', range: '30-36°C',
+              unit1: { '0930': 36.3, '1200': 36.6, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 35.6, '1200': 35.6, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 35.2, '1200': 35.4, '1500': '', '1800': '', '2100': '' } },
+            
+            // Evaporator Status
+            { no: 9, section: 'Evaporator Status', description: 'Evaporator Status', parameter: 'Water In Temp.', unit: '°C', range: '10-13°C',
+              unit1: { '0930': 18.2, '1200': 14.0, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 18.0, '1200': 14.0, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 17.7, '1200': 13.9, '1500': '', '1800': '', '2100': '' } },
+            { no: 10, section: '', description: '', parameter: 'Water Out Temp.', unit: '°C', range: '6-10°C',
+              unit1: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' } },
+            
+            // Motor Status
+            { no: 27, section: 'Motor Status', description: 'Motor Status', parameter: 'Motor Killowatts', unit: 'KW', range: 'Actual',
+              unit1: { '0930': 288.1, '1200': 296.4, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 287.3, '1200': 284.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 291.8, '1200': 279.2, '1500': '', '1800': '', '2100': '' } },
+            { no: 28, section: '', description: '', parameter: 'Motor current', unit: 'AMPS', range: 'Actual',
+              unit1: { '0930': 572.3, '1200': 561.3, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 570.9, '1200': 547.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 575.5, '1200': 533.4, '1500': '', '1800': '', '2100': '' } },
+            { no: 29, section: '', description: '', parameter: 'Percent Load Current', unit: '%', range: 'Actual',
+              unit1: { '0930': 99.5, '1200': 97.6, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 99.3, '1200': 95.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 100.1, '1200': 92.8, '1500': '', '1800': '', '2100': '' } },
+            
+            // Running Status
+            { no: 47, section: 'Running Status', description: 'Running Status', parameter: 'Setpoint Chiller', unit: '°C', range: 'Actual',
+              unit1: { '0930': 8.0, '1200': 8.0, '1500': 8.0, '1800': 8.0, '2100': 8.0 },
+              unit2: { '0930': 8.0, '1200': 8.0, '1500': 8.0, '1800': 8.0, '2100': 8.0 },
+              unit3: { '0930': 8.0, '1200': 8.0, '1500': 8.0, '1800': 8.0, '2100': 8.0 } },
+            { no: 48, section: '', description: '', parameter: 'Fan Cooling Tower', unit: 'Unit', range: 'Actual',
+              unit1: { '0930': 4, '1200': 4, '1500': 4, '1800': 4, '2100': 4 },
+              unit2: { '0930': 4, '1200': 4, '1500': 4, '1800': 4, '2100': 4 },
+              unit3: { '0930': 4, '1200': 4, '1500': 4, '1800': 4, '2100': 4 } }
+        ];
+
+        // Initialize the logsheet
+        function initializeLogsheet() {
+            populateLogsheetTable();
+            populateParameterSelect();
+            updateDateTime();
+        }
+
+        // Populate the main logsheet table
+        function populateLogsheetTable() {
+            const tbody = document.getElementById('logsheetTableBody');
+            tbody.innerHTML = '';
+
+            logsheetData.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // Check if this is a section header
+                const isSection = item.section && item.description === item.section;
+                if (isSection) {
+                    row.className = 'section-header';
+                }
+
+                row.innerHTML = `
+                    <td class="border border-gray-300 p-2 text-center">${item.no}</td>
+                    <td class="border border-gray-300 p-2 ${isSection ? 'font-bold' : ''}">${item.description}</td>
+                    <td class="border border-gray-300 p-2">${item.parameter}</td>
+                    <td class="border border-gray-300 p-2 text-center">${item.unit}</td>
+                    ${generateUnitCells(item.unit1, item.range, item.unit)}
+                    ${generateUnitCells(item.unit2, item.range, item.unit)}
+                    ${generateUnitCells(item.unit3, item.range, item.unit)}
+                    <td class="border border-gray-300 p-2 text-center text-xs"></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Generate unit cells with value validation
+        function generateUnitCells(unitData, range, unit) {
+            const times = ['0930', '1200', '1500', '1800', '2100'];
+            return times.map(time => {
+                const value = unitData[time];
+                const displayValue = value !== '' ? value : '';
+                const cellClass = validateValue(value, range, unit) ? 'in-range' : (value !== '' ? 'out-of-range' : '');
+                return `<td class="border border-gray-300 p-1 text-center value-cell ${cellClass}">${displayValue}</td>`;
+            }).join('');
+        }
+
+        // Validate if value is within acceptable range
+        function validateValue(value, range, unit) {
+            if (value === '' || range === 'Actual') return true;
+            
+            // Simple range validation - can be expanded
+            if (range.includes('-')) {
+                const [min, max] = range.replace(/[°C|kPa|%]/g, '').split('-').map(Number);
+                return value >= min && value <= max;
+            }
+            if (range.includes('<')) {
+                const max = parseFloat(range.replace(/[<°C|kPa|%]/g, ''));
+                return value < max;
+            }
+            if (range.includes('>')) {
+                const min = parseFloat(range.replace(/[>°C|kPa|%]/g, ''));
+                return value > min;
+            }
+            return true;
+        }
+
+        // Populate parameter select for input modal
+        function populateParameterSelect() {
+            const select = document.getElementById('parameterSelect');
+            logsheetData.forEach(item => {
+                if (item.parameter) {
+                    const option = document.createElement('option');
+                    option.value = item.no;
+                    option.textContent = `${item.no}. ${item.parameter}`;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        // Update date and time display
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            });
+            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('id-ID', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            }) + ' WIB';
+        }
+
+        // Update date display when date picker changes
+        function updateDateDisplay() {
+            const dateInput = document.getElementById('dateSelect');
+            const selectedDate = new Date(dateInput.value);
+            document.getElementById('currentDate').textContent = selectedDate.toLocaleDateString('id-ID', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            });
+            loadDataForDate(dateInput.value);
+        }
+
+        // Save data to localStorage
+        function saveDataToStorage() {
+            const currentDate = document.getElementById('dateSelect').value;
+            const storageKey = `logsheet_chiller_${currentDate}`;
+            localStorage.setItem(storageKey, JSON.stringify(logsheetData));
+            localStorage.setItem('logsheet_last_save', new Date().toISOString());
+        }
+
+        // Load data from localStorage
+        function loadDataForDate(date) {
+            const storageKey = `logsheet_chiller_${date}`;
+            const savedData = localStorage.getItem(storageKey);
+            
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                // Update logsheetData with saved data
+                parsedData.forEach((savedItem, index) => {
+                    if (logsheetData[index]) {
+                        logsheetData[index].unit1 = savedItem.unit1;
+                        logsheetData[index].unit2 = savedItem.unit2;
+                        logsheetData[index].unit3 = savedItem.unit3;
+                    }
+                });
+                populateLogsheetTable();
+                showNotification(`Data untuk ${date} berhasil dimuat!`, 'success');
+            } else {
+                // Reset to default empty values for new date
+                logsheetData.forEach(item => {
+                    ['unit1', 'unit2', 'unit3'].forEach(unit => {
+                        ['0930', '1200', '1500', '1800', '2100'].forEach(time => {
+                            if (item[unit] && item[unit][time] !== undefined) {
+                                // Keep default values for setpoint and fan cooling tower
+                                if (item.parameter === 'Setpoint Chiller' || item.parameter === 'Fan Cooling Tower') {
+                                    // Keep existing values
+                                } else {
+                                    item[unit][time] = '';
+                                }
+                            }
+                        });
+                    });
+                });
+                populateLogsheetTable();
+            }
+        }
+
+        // Auto-save data when values change
+        function autoSaveData() {
+            saveDataToStorage();
+            showNotification('Data otomatis tersimpan!', 'success');
+        }
+
+        // Refresh data function
+        function refreshData() {
+            const btn = event.target;
+            btn.innerHTML = '🔄 Refreshing...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                updateDateTime();
+                populateLogsheetTable();
+                btn.innerHTML = '🔄 Refresh Data';
+                btn.disabled = false;
+                showNotification('Data berhasil diperbarui!', 'success');
+            }, 1500);
+        }
+
+        // Export logsheet to Excel
+        function exportLogsheet() {
+            const csvContent = generateLogsheetCSV();
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `logsheet_chiller_${new Date().toISOString().slice(0, 10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Logsheet berhasil diexport!', 'success');
+        }
+
+        // Generate CSV content for logsheet
+        function generateLogsheetCSV() {
+            const headers = ['No', 'Description', 'Parameter', 'Unit', 'Range',
+                'Unit1_0930', 'Unit1_1200', 'Unit1_1500', 'Unit1_1800', 'Unit1_2100',
+                'Unit2_0930', 'Unit2_1200', 'Unit2_1500', 'Unit2_1800', 'Unit2_2100',
+                'Unit3_0930', 'Unit3_1200', 'Unit3_1500', 'Unit3_1800', 'Unit3_2100'];
+            const csvRows = [headers.join(',')];
+            
+            logsheetData.forEach(item => {
+                const row = [
+                    item.no, item.description, item.parameter, item.unit, item.range,
+                    item.unit1['0930'], item.unit1['1200'], item.unit1['1500'], item.unit1['1800'], item.unit1['2100'],
+                    item.unit2['0930'], item.unit2['1200'], item.unit2['1500'], item.unit2['1800'], item.unit2['2100'],
+                    item.unit3['0930'], item.unit3['1200'], item.unit3['1500'], item.unit3['1800'], item.unit3['2100']
+                ];
+                csvRows.push(row.join(','));
+            });
+            
+            return csvRows.join('\n');
+        }
+
+        // Print logsheet
+        function printLogsheet() {
+            window.print();
+        }
+
+        // Open input data modal
+        function inputData() {
+            document.getElementById('inputModal').classList.remove('hidden');
+        }
+
+        // Close input data modal
+        function closeInputModal() {
+            document.getElementById('inputModal').classList.add('hidden');
+            document.getElementById('inputForm').reset();
+        }
+
+        // Handle input form submission
+        document.getElementById('inputForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const paramNo = document.getElementById('parameterSelect').value;
+            const unit = document.getElementById('unitInput').value;
+            const time = document.getElementById('timeInput').value;
+            const value = parseFloat(document.getElementById('valueInput').value);
+            
+            if (paramNo && unit && time && !isNaN(value)) {
+                // Find and update the data
+                const dataItem = logsheetData.find(item => item.no == paramNo);
+                if (dataItem) {
+                    dataItem[unit][time] = value;
+                    populateLogsheetTable();
+                    saveDataToStorage();
+                    closeInputModal();
+                    showNotification('Data berhasil disimpan!', 'success');
+                }
+            } else {
+                showNotification('Mohon lengkapi semua field!', 'error');
+            }
+        });
+
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-medium z-50 ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Quick Input Mode Functions
+        function quickInputMode() {
+            document.getElementById('quickInputModal').classList.remove('hidden');
+            populateQuickInputTable();
+        }
+
+        function closeQuickInputModal() {
+            document.getElementById('quickInputModal').classList.add('hidden');
+        }
+
+        function populateQuickInputTable() {
+            const tbody = document.getElementById('quickInputTableBody');
+            const selectedUnit = document.getElementById('quickUnitSelect').value;
+            const selectedTime = document.getElementById('quickTimeSelect').value;
+            
+            tbody.innerHTML = '';
+
+            logsheetData.forEach(item => {
+                if (item.parameter) {
+                    const row = document.createElement('tr');
+                    const currentValue = item[selectedUnit][selectedTime];
+                    const isValid = validateValue(currentValue, item.range, item.unit);
+                    
+                    const statusClass = currentValue === '' ? 'bg-gray-100' : 
+                                       isValid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                    const statusText = currentValue === '' ? 'Belum diisi' : 
+                                      isValid ? '✅ Normal' : '⚠️ Di luar range';
+
+                    row.innerHTML = `
+                        <td class="border border-gray-300 p-2 text-center">${item.no}</td>
+                        <td class="border border-gray-300 p-2">${item.parameter}</td>
+                        <td class="border border-gray-300 p-2 text-center">${item.unit}</td>
+                        <td class="border border-gray-300 p-2 text-xs">${item.range}</td>
+                        <td class="border border-gray-300 p-2 text-center">
+                            <input type="number" step="0.1" 
+                                   value="${currentValue}" 
+                                   data-param="${item.no}"
+                                   data-unit="${selectedUnit}"
+                                   data-time="${selectedTime}"
+                                   class="w-full text-center border-0 bg-transparent focus:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
+                                   onkeydown="handleQuickInputKeydown(event)"
+                                   onblur="updateQuickInputValue(this)">
+                        </td>
+                        <td class="border border-gray-300 p-2 text-center">
+                            <span class="px-2 py-1 rounded text-xs ${statusClass}">${statusText}</span>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            });
+        }
+
+        function handleQuickInputKeydown(event) {
+            if (event.key === 'Enter') {
+                updateQuickInputValue(event.target);
+                event.target.blur();
+            } else if (event.key === 'Escape') {
+                event.target.blur();
+            }
+        }
+
+        function updateQuickInputValue(input) {
+            const paramNo = input.dataset.param;
+            const unit = input.dataset.unit;
+            const time = input.dataset.time;
+            const value = parseFloat(input.value) || '';
+            
+            const dataItem = logsheetData.find(item => item.no == paramNo);
+            if (dataItem) {
+                dataItem[unit][time] = value;
+                saveDataToStorage();
+                
+                // Update status
+                const row = input.closest('tr');
+                const statusCell = row.querySelector('td:last-child span');
+                const isValid = validateValue(value, dataItem.range, dataItem.unit);
+                
+                if (value === '') {
+                    statusCell.className = 'px-2 py-1 rounded text-xs bg-gray-100';
+                    statusCell.textContent = 'Belum diisi';
+                } else if (isValid) {
+                    statusCell.className = 'px-2 py-1 rounded text-xs bg-green-100 text-green-800';
+                    statusCell.textContent = '✅ Normal';
+                } else {
+                    statusCell.className = 'px-2 py-1 rounded text-xs bg-red-100 text-red-800';
+                    statusCell.textContent = '⚠️ Di luar range';
+                }
+            }
+        }
+
+        function saveAllQuickInput() {
+            populateLogsheetTable();
+            showNotification('Semua data berhasil disimpan!', 'success');
+        }
+
+        // Update quick input table when unit or time changes
+        document.getElementById('quickUnitSelect').addEventListener('change', populateQuickInputTable);
+        document.getElementById('quickTimeSelect').addEventListener('change', populateQuickInputTable);
+
+        // Backup all data
+        function backupAllData() {
+            const allData = {};
+            const keys = Object.keys(localStorage).filter(key => key.startsWith('logsheet_chiller_'));
+            
+            keys.forEach(key => {
+                allData[key] = localStorage.getItem(key);
+            });
+            
+            const backupData = {
+                timestamp: new Date().toISOString(),
+                data: allData
+            };
+            
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `backup_logsheet_chiller_${new Date().toISOString().slice(0, 10)}.json`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Backup data berhasil didownload!', 'success');
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeLogsheet();
+            // Load data for current date
+            loadDataForDate(document.getElementById('dateSelect').value);
+        });
+
+        // Auto-refresh every 5 minutes
+        setInterval(updateDateTime, 300000);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97419d2413dd9509',t:'MTc1NjAyNTU0OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
