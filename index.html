@@ -225,41 +225,91 @@
 
         <!-- Signature Section -->
         <div class="bg-white rounded-xl card-shadow p-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">👥 Tanda Tangan Petugas</h3>
             <div class="grid grid-cols-1 md:grid-cols-7 gap-4 text-center">
                 <div class="border border-gray-300 p-4 rounded">
                     <p class="font-semibold text-sm mb-2">Dibuat Oleh</p>
-                    <div class="h-16 mb-2"></div>
-                    <p class="text-xs">Spv. Engineering</p>
+                    <input type="text" id="supervisor" placeholder="Nama Supervisor" 
+                           class="w-full text-center text-xs border border-gray-200 rounded px-2 py-1 mb-2 focus:ring-2 focus:ring-blue-500"
+                           onchange="saveStaffData()">
+                    <div class="h-12 mb-2 border-t border-gray-200 pt-2">
+                        <input type="text" id="supervisorSignature" placeholder="Tanda tangan digital" 
+                               class="w-full text-center text-xs border border-gray-200 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500"
+                               onchange="saveStaffData()">
+                    </div>
+                    <p class="text-xs font-medium">Spv. Engineering</p>
                 </div>
                 <div class="border border-gray-300 p-4 rounded">
                     <p class="font-semibold text-sm mb-2">Pic Logsheet</p>
-                    <p class="text-xs mb-1">09:30</p>
-                    <div class="h-12 mb-2"></div>
+                    <p class="text-xs mb-1 font-medium">09:30</p>
+                    <input type="text" id="staff0930" placeholder="Nama Petugas" 
+                           class="w-full text-center text-xs border border-gray-200 rounded px-2 py-1 mb-2 focus:ring-2 focus:ring-blue-500"
+                           onchange="saveStaffData()">
+                    <div class="h-8 mb-2 border-t border-gray-200 pt-1">
+                        <input type="text" id="signature0930" placeholder="TTD" 
+                               class="w-full text-center text-xs border border-gray-200 rounded px-1 py-1 focus:ring-2 focus:ring-blue-500"
+                               onchange="saveStaffData()">
+                    </div>
                 </div>
                 <div class="border border-gray-300 p-4 rounded">
                     <p class="font-semibold text-sm mb-2">Pic Logsheet</p>
-                    <p class="text-xs mb-1">12:00</p>
-                    <div class="h-12 mb-2"></div>
+                    <p class="text-xs mb-1 font-medium">12:00</p>
+                    <input type="text" id="staff1200" placeholder="Nama Petugas" 
+                           class="w-full text-center text-xs border border-gray-200 rounded px-2 py-1 mb-2 focus:ring-2 focus:ring-blue-500"
+                           onchange="saveStaffData()">
+                    <div class="h-8 mb-2 border-t border-gray-200 pt-1">
+                        <input type="text" id="signature1200" placeholder="TTD" 
+                               class="w-full text-center text-xs border border-gray-200 rounded px-1 py-1 focus:ring-2 focus:ring-blue-500"
+                               onchange="saveStaffData()">
+                    </div>
                 </div>
                 <div class="border border-gray-300 p-4 rounded">
                     <p class="font-semibold text-sm mb-2">Pic Logsheet</p>
-                    <p class="text-xs mb-1">15:00</p>
-                    <div class="h-12 mb-2"></div>
+                    <p class="text-xs mb-1 font-medium">15:00</p>
+                    <input type="text" id="staff1500" placeholder="Nama Petugas" 
+                           class="w-full text-center text-xs border border-gray-200 rounded px-2 py-1 mb-2 focus:ring-2 focus:ring-blue-500"
+                           onchange="saveStaffData()">
+                    <div class="h-8 mb-2 border-t border-gray-200 pt-1">
+                        <input type="text" id="signature1500" placeholder="TTD" 
+                               class="w-full text-center text-xs border border-gray-200 rounded px-1 py-1 focus:ring-2 focus:ring-blue-500"
+                               onchange="saveStaffData()">
+                    </div>
                 </div>
                 <div class="border border-gray-300 p-4 rounded">
                     <p class="font-semibold text-sm mb-2">Pic Logsheet</p>
-                    <p class="text-xs mb-1">18:00</p>
-                    <div class="h-12 mb-2"></div>
+                    <p class="text-xs mb-1 font-medium">18:00</p>
+                    <input type="text" id="staff1800" placeholder="Nama Petugas" 
+                           class="w-full text-center text-xs border border-gray-200 rounded px-2 py-1 mb-2 focus:ring-2 focus:ring-blue-500"
+                           onchange="saveStaffData()">
+                    <div class="h-8 mb-2 border-t border-gray-200 pt-1">
+                        <input type="text" id="signature1800" placeholder="TTD" 
+                               class="w-full text-center text-xs border border-gray-200 rounded px-1 py-1 focus:ring-2 focus:ring-blue-500"
+                               onchange="saveStaffData()">
+                    </div>
                 </div>
                 <div class="border border-gray-300 p-4 rounded">
                     <p class="font-semibold text-sm mb-2">Pic Logsheet</p>
-                    <p class="text-xs mb-1">21:00</p>
-                    <div class="h-12 mb-2"></div>
+                    <p class="text-xs mb-1 font-medium">21:00</p>
+                    <input type="text" id="staff2100" placeholder="Nama Petugas" 
+                           class="w-full text-center text-xs border border-gray-200 rounded px-2 py-1 mb-2 focus:ring-2 focus:ring-blue-500"
+                           onchange="saveStaffData()">
+                    <div class="h-8 mb-2 border-t border-gray-200 pt-1">
+                        <input type="text" id="signature2100" placeholder="TTD" 
+                               class="w-full text-center text-xs border border-gray-200 rounded px-1 py-1 focus:ring-2 focus:ring-blue-500"
+                               onchange="saveStaffData()">
+                    </div>
                 </div>
                 <div class="border border-gray-300 p-4 rounded">
                     <p class="font-semibold text-sm mb-2">Mengetahui</p>
-                    <div class="h-16 mb-2"></div>
-                    <p class="text-xs">Manager Engineering</p>
+                    <input type="text" id="manager" placeholder="Nama Manager" 
+                           class="w-full text-center text-xs border border-gray-200 rounded px-2 py-1 mb-2 focus:ring-2 focus:ring-blue-500"
+                           onchange="saveStaffData()">
+                    <div class="h-12 mb-2 border-t border-gray-200 pt-2">
+                        <input type="text" id="managerSignature" placeholder="Tanda tangan digital" 
+                               class="w-full text-center text-xs border border-gray-200 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500"
+                               onchange="saveStaffData()">
+                    </div>
+                    <p class="text-xs font-medium">Manager Engineering</p>
                 </div>
             </div>
         </div>
@@ -390,9 +440,9 @@
     </div>
 
     <script>
-        // Logsheet data structure
+        // Logsheet data structure with exact sequential numbering from Excel
         const logsheetData = [
-            // Condenser Status
+            // Condenser Status (1-5)
             { no: 1, section: 'Condenser status', description: 'Condenser status', parameter: 'Water In Temp.', unit: '°C', range: '27-31°C', 
               unit1: { '0930': 29.7, '1200': 29.4, '1500': '', '1800': '', '2100': '' },
               unit2: { '0930': 29.8, '1200': 29.4, '1500': '', '1800': '', '2100': '' },
@@ -414,7 +464,7 @@
               unit2: { '0930': 35.6, '1200': 35.6, '1500': '', '1800': '', '2100': '' },
               unit3: { '0930': 35.2, '1200': 35.4, '1500': '', '1800': '', '2100': '' } },
             
-            // Evaporator Status
+            // Evaporator Status (9-14)
             { no: 9, section: 'Evaporator Status', description: 'Evaporator Status', parameter: 'Water In Temp.', unit: '°C', range: '10-13°C',
               unit1: { '0930': 18.2, '1200': 14.0, '1500': '', '1800': '', '2100': '' },
               unit2: { '0930': 18.0, '1200': 14.0, '1500': '', '1800': '', '2100': '' },
@@ -423,8 +473,50 @@
               unit1: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' },
               unit2: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' },
               unit3: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' } },
+            { no: 11, section: '', description: '', parameter: 'Evaporator Approach', unit: '°C', range: '<2.2°C',
+              unit1: { '0930': 0.1, '1200': 0.1, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 0.1, '1200': 0.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 0.1, '1200': 0.1, '1500': '', '1800': '', '2100': '' } },
+            { no: 12, section: '', description: '', parameter: 'Evaporator Pressure', unit: 'Kpa', range: 'Low: >-47 kPa, High: <187 kPa',
+              unit1: { '0930': -30.4, '1200': -38.2, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': -27.8, '1200': -36.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': -34.4, '1200': -40.0, '1500': '', '1800': '', '2100': '' } },
+            { no: 13, section: '', description: '', parameter: 'Evap Saturated Refrig Temp', unit: '°C', range: 'Low: >2.2°C, High: <15°C',
+              unit1: { '0930': 9.1, '1200': 6.2, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 10.0, '1200': 7.0, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 7.7, '1200': 5.5, '1500': '', '1800': '', '2100': '' } },
+            { no: 14, section: '', description: '', parameter: 'Evap Refrig Liquid Temp.', unit: '°C', range: '7-10°C',
+              unit1: { '0930': 13.5, '1200': 8.6, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 13.9, '1200': 8.9, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 13.4, '1200': 8.7, '1500': '', '1800': '', '2100': '' } },
             
-            // Motor Status
+            // Compressor Status (19-26)
+            { no: 19, section: 'Compressor Status', description: 'Compressor Status', parameter: 'Compressor Running Hour', unit: 'Hours', range: 'Actual',
+              unit1: { '0930': 1287.4, '1200': 1280.5, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 1279.1, '1200': 1281.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 1278.8, '1200': 1280.8, '1500': '', '1800': '', '2100': '' } },
+            { no: 20, section: '', description: '', parameter: 'Compressor Starts Number', unit: '', range: 'Actual',
+              unit1: { '0930': 141.0, '1200': 141.0, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 147.0, '1200': 147.0, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 140.0, '1200': 140.0, '1500': '', '1800': '', '2100': '' } },
+            { no: 21, section: '', description: '', parameter: 'Comp. Discharge Temp.', unit: '°C', range: '<50°C',
+              unit1: { '0930': 39.6, '1200': 38.9, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 39.9, '1200': 38.6, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 40.3, '1200': 38.3, '1500': '', '1800': '', '2100': '' } },
+            { no: 24, section: '', description: '', parameter: 'Discharge Superheat', unit: '°C', range: '<8°C',
+              unit1: { '0930': 3.4, '1200': 2.4, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 4.2, '1200': 2.9, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 5.1, '1200': 2.9, '1500': '', '1800': '', '2100': '' } },
+            { no: 25, section: '', description: '', parameter: 'Actual GV1 Position', unit: '%', range: '0-93',
+              unit1: { '0930': 92.8, '1200': 86.5, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 93.4, '1200': 93.4, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 93.5, '1200': 79.2, '1500': '', '1800': '', '2100': '' } },
+            { no: 26, section: '', description: '', parameter: 'Actual GV2 Position', unit: '%', range: '0-93',
+              unit1: { '0930': 93.2, '1200': 90.6, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 93.5, '1200': 93.4, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 93.5, '1200': 87.8, '1500': '', '1800': '', '2100': '' } },
+            
+            // Motor Status (27-30)
             { no: 27, section: 'Motor Status', description: 'Motor Status', parameter: 'Motor Killowatts', unit: 'KW', range: 'Actual',
               unit1: { '0930': 288.1, '1200': 296.4, '1500': '', '1800': '', '2100': '' },
               unit2: { '0930': 287.3, '1200': 284.1, '1500': '', '1800': '', '2100': '' },
@@ -437,8 +529,82 @@
               unit1: { '0930': 99.5, '1200': 97.6, '1500': '', '1800': '', '2100': '' },
               unit2: { '0930': 99.3, '1200': 95.1, '1500': '', '1800': '', '2100': '' },
               unit3: { '0930': 100.1, '1200': 92.8, '1500': '', '1800': '', '2100': '' } },
+            { no: 30, section: '', description: '', parameter: 'Motor Winding 1 temp', unit: '°C', range: '<100°C',
+              unit1: { '0930': 35.9, '1200': 31.0, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 26.5, '1200': 24.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 30.4, '1200': 25.3, '1500': '', '1800': '', '2100': '' } },
             
-            // Running Status
+            // VFD Status (31-35)
+            { no: 31, section: 'VFD Status', description: 'VFD Status', parameter: 'Actual Line Voltage', unit: 'Volts', range: 'Actual',
+              unit1: { '0930': 381.9, '1200': 383.6, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 382.6, '1200': 387.0, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 383.6, '1200': 387.4, '1500': '', '1800': '', '2100': '' } },
+            { no: 32, section: '', description: '', parameter: 'Actual Vfd Freq', unit: 'Hz', range: 'Actual',
+              unit1: { '0930': 78.7, '1200': 82.4, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 78.6, '1200': 80.9, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 79.6, '1200': 81.7, '1500': '', '1800': '', '2100': '' } },
+            { no: 33, section: '', description: '', parameter: 'Actual Vfd Speed', unit: '%', range: 'Actual',
+              unit1: { '0930': 96.3, '1200': 100.8, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 96.2, '1200': 99.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 97.4, '1200': 100.0, '1500': '', '1800': '', '2100': '' } },
+            { no: 34, section: '', description: '', parameter: 'Actual Line Current', unit: 'AMPS', range: 'Actual',
+              unit1: { '0930': 499.7, '1200': 501.6, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 693.7, '1200': 487.8, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 505.9, '1200': 477.1, '1500': '', '1800': '', '2100': '' } },
+            { no: 35, section: '', description: '', parameter: 'Vfd Load Current', unit: 'AMPS', range: 'Actual',
+              unit1: { '0930': 567.3, '1200': 556.9, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 567.9, '1200': 545.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 568.0, '1200': 530.4, '1500': '', '1800': '', '2100': '' } },
+            
+            // Purge System (36-38)
+            { no: 36, section: 'Purge Syst.', description: 'Purge Syst.', parameter: 'Total Pumpout Number', unit: '', range: 'Actual',
+              unit1: { '0930': 7.0, '1200': 7.0, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 9.0, '1200': 9.0, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 19.0, '1200': 19.0, '1500': '', '1800': '', '2100': '' } },
+            { no: 37, section: '', description: '', parameter: 'Purge Comp.Suction Temp.', unit: '°C', range: '-25-30°C',
+              unit1: { '0930': 23.0, '1200': 20.1, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 33.1, '1200': 34.0, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 11.3, '1200': 5.3, '1500': '', '1800': '', '2100': '' } },
+            { no: 38, section: '', description: '', parameter: 'Purge Inlet Temp.', unit: '°C', range: '<38°C',
+              unit1: { '0930': 36.3, '1200': 36.6, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 35.6, '1200': 35.8, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 35.2, '1200': 35.4, '1500': '', '1800': '', '2100': '' } },
+            
+            // Lubrication (39-46)
+            { no: 39, section: 'Lubrication', description: 'Lubrication', parameter: 'Bearing Ref. Suplay Sat. Temp.', unit: '°C', range: '30-60°C',
+              unit1: { '0930': 45.5, '1200': 45.6, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 43.1, '1200': 43.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 50.9, '1200': 51.2, '1500': '', '1800': '', '2100': '' } },
+            { no: 40, section: '', description: '', parameter: '1st Stage Bearing Temp.', unit: '°C', range: '40-50°C',
+              unit1: { '0930': 21.3, '1200': 19.9, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 18.6, '1200': 16.9, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 14.6, '1200': 12.5, '1500': '', '1800': '', '2100': '' } },
+            { no: 41, section: '', description: '', parameter: '2nd Stage Bearing Temp.', unit: '°C', range: '40-50°C',
+              unit1: { '0930': 28.2, '1200': 27.3, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 27.0, '1200': 26.3, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 27.7, '1200': 27.1, '1500': '', '1800': '', '2100': '' } },
+            { no: 42, section: '', description: '', parameter: 'Bearing Inlet Pressure', unit: 'Kpa', range: '60-180 kPa',
+              unit1: { '0930': 153.0, '1200': 152.9, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 135.2, '1200': 134.2, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 199.1, '1200': 202.3, '1500': '', '1800': '', '2100': '' } },
+            { no: 43, section: '', description: '', parameter: 'Bearing Outlet pressure', unit: 'Kpa', range: '3 - (-40) kPa',
+              unit1: { '0930': -17.9, '1200': -25.6, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': -19.7, '1200': -25.4, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 25.7, '1200': -30.4, '1500': '', '1800': '', '2100': '' } },
+            { no: 44, section: '', description: '', parameter: 'Pump Inlet Pressure', unit: 'Kpa', range: '>80 kPa',
+              unit1: { '0930': 94.8, '1200': 96.0, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 94.7, '1200': 96.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 92.9, '1200': 91.8, '1500': '', '1800': '', '2100': '' } },
+            { no: 45, section: '', description: '', parameter: 'Pump Outlet Pressure', unit: 'Kpa', range: '>100 kPa',
+              unit1: { '0930': 195.0, '1200': 194.7, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 168.8, '1200': 168.1, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 248.8, '1200': 249.2, '1500': '', '1800': '', '2100': '' } },
+            { no: 46, section: '', description: '', parameter: 'Ref Pump Amps', unit: 'Amps', range: '1.0-3.0',
+              unit1: { '0930': 100.2, '1200': 98.8, '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 74.1, '1200': 71.9, '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 155.9, '1200': 157.4, '1500': '', '1800': '', '2100': '' } },
+            
+            // Running Status (47-52)
             { no: 47, section: 'Running Status', description: 'Running Status', parameter: 'Setpoint Chiller', unit: '°C', range: 'Actual',
               unit1: { '0930': 8.0, '1200': 8.0, '1500': 8.0, '1800': 8.0, '2100': 8.0 },
               unit2: { '0930': 8.0, '1200': 8.0, '1500': 8.0, '1800': 8.0, '2100': 8.0 },
@@ -446,8 +612,42 @@
             { no: 48, section: '', description: '', parameter: 'Fan Cooling Tower', unit: 'Unit', range: 'Actual',
               unit1: { '0930': 4, '1200': 4, '1500': 4, '1800': 4, '2100': 4 },
               unit2: { '0930': 4, '1200': 4, '1500': 4, '1800': 4, '2100': 4 },
-              unit3: { '0930': 4, '1200': 4, '1500': 4, '1800': 4, '2100': 4 } }
+              unit3: { '0930': 4, '1200': 4, '1500': 4, '1800': 4, '2100': 4 } },
+            { no: 49, section: '', description: '', parameter: 'Freq CWP', unit: 'Hz', range: 'Actual',
+              unit1: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' } },
+            { no: 50, section: '', description: '', parameter: 'Freq CHWP', unit: 'Hz', range: 'Actual',
+              unit1: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' } },
+            { no: 51, section: '', description: '', parameter: 'Doshing Pump CT', unit: 'Unit', range: 'Actual',
+              unit1: { '0930': 1, '1200': '', '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': 1, '1200': '', '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': 1, '1200': '', '1500': '', '1800': '', '2100': '' } },
+            { no: 52, section: '', description: '', parameter: 'Doshing Pump Chiller', unit: 'Unit', range: 'Actual',
+              unit1: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
+              unit2: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
+              unit3: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' } }
         ];
+
+        // Staff data for signature tracking
+        let staffData = {
+            '0930': '',
+            '1200': '',
+            '1500': '',
+            '1800': '',
+            '2100': '',
+            supervisor: '',
+            manager: '',
+            signature0930: '',
+            signature1200: '',
+            signature1500: '',
+            signature1800: '',
+            signature2100: '',
+            supervisorSignature: '',
+            managerSignature: ''
+        };
 
         // Initialize the logsheet
         function initializeLogsheet() {
@@ -598,6 +798,76 @@
                 year: 'numeric' 
             });
             loadDataForDate(dateInput.value);
+            loadStaffData(dateInput.value);
+        }
+
+        // Save staff data
+        function saveStaffData() {
+            const currentDate = document.getElementById('dateSelect').value;
+            staffData = {
+                '0930': document.getElementById('staff0930').value,
+                '1200': document.getElementById('staff1200').value,
+                '1500': document.getElementById('staff1500').value,
+                '1800': document.getElementById('staff1800').value,
+                '2100': document.getElementById('staff2100').value,
+                supervisor: document.getElementById('supervisor').value,
+                manager: document.getElementById('manager').value,
+                signature0930: document.getElementById('signature0930').value,
+                signature1200: document.getElementById('signature1200').value,
+                signature1500: document.getElementById('signature1500').value,
+                signature1800: document.getElementById('signature1800').value,
+                signature2100: document.getElementById('signature2100').value,
+                supervisorSignature: document.getElementById('supervisorSignature').value,
+                managerSignature: document.getElementById('managerSignature').value
+            };
+            
+            localStorage.setItem(`staff_data_${currentDate}`, JSON.stringify(staffData));
+            showNotification('Data petugas tersimpan!', 'success');
+        }
+
+        // Load staff data
+        function loadStaffData(date) {
+            const savedStaffData = localStorage.getItem(`staff_data_${date}`);
+            if (savedStaffData) {
+                const data = JSON.parse(savedStaffData);
+                document.getElementById('staff0930').value = data['0930'] || '';
+                document.getElementById('staff1200').value = data['1200'] || '';
+                document.getElementById('staff1500').value = data['1500'] || '';
+                document.getElementById('staff1800').value = data['1800'] || '';
+                document.getElementById('staff2100').value = data['2100'] || '';
+                document.getElementById('supervisor').value = data.supervisor || '';
+                document.getElementById('manager').value = data.manager || '';
+                document.getElementById('signature0930').value = data.signature0930 || '';
+                document.getElementById('signature1200').value = data.signature1200 || '';
+                document.getElementById('signature1500').value = data.signature1500 || '';
+                document.getElementById('signature1800').value = data.signature1800 || '';
+                document.getElementById('signature2100').value = data.signature2100 || '';
+                document.getElementById('supervisorSignature').value = data.supervisorSignature || '';
+                document.getElementById('managerSignature').value = data.managerSignature || '';
+                staffData = data;
+            } else {
+                // Clear all fields for new date
+                document.getElementById('staff0930').value = '';
+                document.getElementById('staff1200').value = '';
+                document.getElementById('staff1500').value = '';
+                document.getElementById('staff1800').value = '';
+                document.getElementById('staff2100').value = '';
+                document.getElementById('supervisor').value = '';
+                document.getElementById('manager').value = '';
+                document.getElementById('signature0930').value = '';
+                document.getElementById('signature1200').value = '';
+                document.getElementById('signature1500').value = '';
+                document.getElementById('signature1800').value = '';
+                document.getElementById('signature2100').value = '';
+                document.getElementById('supervisorSignature').value = '';
+                document.getElementById('managerSignature').value = '';
+                staffData = {
+                    '0930': '', '1200': '', '1500': '', '1800': '', '2100': '',
+                    supervisor: '', manager: '',
+                    signature0930: '', signature1200: '', signature1500: '', signature1800: '', signature2100: '',
+                    supervisorSignature: '', managerSignature: ''
+                };
+            }
         }
 
         // Save data to localStorage with enhanced metadata
@@ -740,9 +1010,11 @@
                 csvContent += row.join(',') + '\n';
             });
             
-            // Add signature section
+            // Add signature section with staff names and signatures
             csvContent += `\n\nTanda Tangan:\n`;
             csvContent += `Dibuat Oleh,Pic 09:30,Pic 12:00,Pic 15:00,Pic 18:00,Pic 21:00,Mengetahui\n`;
+            csvContent += `"${staffData.supervisor}","${staffData['0930']}","${staffData['1200']}","${staffData['1500']}","${staffData['1800']}","${staffData['2100']}","${staffData.manager}"\n`;
+            csvContent += `"${staffData.supervisorSignature}","${staffData.signature0930}","${staffData.signature1200}","${staffData.signature1500}","${staffData.signature1800}","${staffData.signature2100}","${staffData.managerSignature}"\n`;
             csvContent += `Spv. Engineering,,,,,, Manager Engineering\n`;
             
             // Download file
@@ -762,10 +1034,16 @@
         // Backup all data with metadata
         function backupAllData() {
             const allData = {};
+            const allStaffData = {};
             const keys = Object.keys(localStorage).filter(key => key.startsWith('logsheet_chiller_'));
+            const staffKeys = Object.keys(localStorage).filter(key => key.startsWith('staff_data_'));
             
             keys.forEach(key => {
                 allData[key] = localStorage.getItem(key);
+            });
+            
+            staffKeys.forEach(key => {
+                allStaffData[key] = localStorage.getItem(key);
             });
             
             const backupData = {
@@ -773,6 +1051,7 @@
                 timestamp: new Date().toISOString(),
                 totalDays: keys.length,
                 data: allData,
+                staffData: allStaffData,
                 metadata: {
                     facility: 'Mall Living World Grand Wisata',
                     system: 'Chiller Plan Logsheet',
@@ -812,8 +1091,17 @@
                                     localStorage.setItem(key, backupData.data[key]);
                                 });
                                 
+                                // Restore staff data if available
+                                if (backupData.staffData) {
+                                    Object.keys(backupData.staffData).forEach(key => {
+                                        localStorage.setItem(key, backupData.staffData[key]);
+                                    });
+                                }
+                                
                                 // Reload current date data
-                                loadDataForDate(document.getElementById('dateSelect').value);
+                                const currentDate = document.getElementById('dateSelect').value;
+                                loadDataForDate(currentDate);
+                                loadStaffData(currentDate);
                                 
                                 showNotification(`Import berhasil! ${Object.keys(backupData.data).length} hari data dipulihkan.`, 'success');
                             } else {
@@ -901,6 +1189,14 @@
             let reportContent = `LAPORAN HARIAN LOGSHEET CHILLER\n`;
             reportContent += `Mall Living World Grand Wisata\n`;
             reportContent += `Tanggal: ${formattedDate}\n\n`;
+            reportContent += `PETUGAS:\n`;
+            reportContent += `- Supervisor: ${staffData.supervisor || '-'}\n`;
+            reportContent += `- Petugas 09:30: ${staffData['0930'] || '-'}\n`;
+            reportContent += `- Petugas 12:00: ${staffData['1200'] || '-'}\n`;
+            reportContent += `- Petugas 15:00: ${staffData['1500'] || '-'}\n`;
+            reportContent += `- Petugas 18:00: ${staffData['1800'] || '-'}\n`;
+            reportContent += `- Petugas 21:00: ${staffData['2100'] || '-'}\n`;
+            reportContent += `- Manager: ${staffData.manager || '-'}\n\n`;
             reportContent += `RINGKASAN:\n`;
             reportContent += `- Total Parameter: ${totalParams}\n`;
             reportContent += `- Data Terisi: ${filledParams} (${completionRate}%)\n`;
@@ -1114,7 +1410,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeLogsheet();
             // Load data for current date
-            loadDataForDate(document.getElementById('dateSelect').value);
+            const currentDate = document.getElementById('dateSelect').value;
+            loadDataForDate(currentDate);
+            loadStaffData(currentDate);
         });
 
         // Auto-refresh every 5 minutes
@@ -1137,6 +1435,5 @@
             }
         }, 30000);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9741ba03f19e4ad6',t:'MTc1NjAyNjczMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'974e69cb204cf46d',t:'MTc1NjE1OTc2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
-
