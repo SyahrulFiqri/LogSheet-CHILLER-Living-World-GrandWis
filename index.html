@@ -655,13 +655,52 @@
         };
 
         // Initialize the logsheet
-        function initializeLogsheet() {
-            populateLogsheetTable();
-            populateParameterSelect();
-            updateDateTime();
-            updateStatistics();
-            loadLastSaveTime();
-        }
+function initializeLogsheet() {
+    populateLogsheetTable();
+    populateParameterSelect();
+    updateDateTime();
+    updateStatistics();
+    loadLastSaveTime();
+}
+
+// ==================== TAMPILKAN DATA LOGSHEET DI TABEL ====================
+function populateLogsheetTable() {
+    const tbody = document.getElementById('logsheetBody');
+    if (!tbody) return; // aman kalau tabel belum dibuat
+    tbody.innerHTML = '';
+
+    logsheetData.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "border-b hover:bg-gray-50";
+        tr.innerHTML = `
+            <td class="px-2 py-1 text-center">${item.no}</td>
+            <td class="px-2 py-1">${item.section || ''}</td>
+            <td class="px-2 py-1">${item.parameter}</td>
+            <td class="px-2 py-1 text-center">${item.unit}</td>
+            <td class="px-2 py-1 text-center">${item.range}</td>
+
+            <td class="value-cell">${item.unit1["0930"] ?? ''}</td>
+            <td class="value-cell">${item.unit1["1200"] ?? ''}</td>
+            <td class="value-cell">${item.unit1["1500"] ?? ''}</td>
+            <td class="value-cell">${item.unit1["1800"] ?? ''}</td>
+            <td class="value-cell">${item.unit1["2100"] ?? ''}</td>
+
+            <td class="value-cell">${item.unit2["0930"] ?? ''}</td>
+            <td class="value-cell">${item.unit2["1200"] ?? ''}</td>
+            <td class="value-cell">${item.unit2["1500"] ?? ''}</td>
+            <td class="value-cell">${item.unit2["1800"] ?? ''}</td>
+            <td class="value-cell">${item.unit2["2100"] ?? ''}</td>
+
+            <td class="value-cell">${item.unit3["0930"] ?? ''}</td>
+            <td class="value-cell">${item.unit3["1200"] ?? ''}</td>
+            <td class="value-cell">${item.unit3["1500"] ?? ''}</td>
+            <td class="value-cell">${item.unit3["1800"] ?? ''}</td>
+            <td class="value-cell">${item.unit3["2100"] ?? ''}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
 
         // Populate the main logsheet table
         function populateLogsheetTable() {
@@ -1644,4 +1683,5 @@ function exportMonthlyLogsheet() {
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'974e69cb204cf46d',t:'MTc1NjE1OTc2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
+
 
