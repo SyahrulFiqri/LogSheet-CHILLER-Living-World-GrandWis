@@ -6,6 +6,7 @@
     <title>LOGSHEET CHILLER PLAN - Mall Living World Grand Wisata</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -81,9 +82,13 @@
                 <div class="flex flex-wrap gap-2">
                     <div class="flex gap-2">
                         <span class="text-sm font-medium text-gray-700 self-center">📊 Export:</span>
-                        <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
-                            📈 Excel
+                       <button onclick="exportLogsheet()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            📊 Export Excel
                         </button>
+                        <button onclick="exportMonthlyLogsheet()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            📆 Export Bulanan
+                        </button>
+
                         <button onclick="generateDailyReport()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm">
                             📋 Laporan
                         </button>
@@ -968,48 +973,250 @@
         }
 
         // Advanced Export to Excel with proper formatting
-        function exportToExcel() {
-            const currentDate = document.getElementById('dateSelect').value;
-            const formattedDate = new Date(currentDate).toLocaleDateString('id-ID');
-            
-            // Create Excel-compatible CSV with proper formatting
-            let csvContent = `LOGSHEET CHILLER PLAN - MALL LIVING WORLD GRAND WISATA\n`;
-            csvContent += `Tanggal: ${formattedDate}\n\n`;
-            
-            // Headers
-            csvContent += `No,Description,Parameter,Unit,Range,`;
-            csvContent += `Unit1_0930,Unit1_1200,Unit1_1500,Unit1_1800,Unit1_2100,`;
-            csvContent += `Unit2_0930,Unit2_1200,Unit2_1500,Unit2_1800,Unit2_2100,`;
-            csvContent += `Unit3_0930,Unit3_1200,Unit3_1500,Unit3_1800,Unit3_2100,Keterangan\n`;
-            
-            // Data rows
-            logsheetData.forEach(item => {
-                const row = [
-                    item.no,
-                    `"${item.description}"`,
-                    `"${item.parameter}"`,
-                    item.unit,
-                    `"${item.range}"`,
-                    item.unit1['0930'] || '',
-                    item.unit1['1200'] || '',
-                    item.unit1['1500'] || '',
-                    item.unit1['1800'] || '',
-                    item.unit1['2100'] || '',
-                    item.unit2['0930'] || '',
-                    item.unit2['1200'] || '',
-                    item.unit2['1500'] || '',
-                    item.unit2['1800'] || '',
-                    item.unit2['2100'] || '',
-                    item.unit3['0930'] || '',
-                    item.unit3['1200'] || '',
-                    item.unit3['1500'] || '',
-                    item.unit3['1800'] || '',
-                    item.unit3['2100'] || '',
-                    ''
-                ];
-                csvContent += row.join(',') + '\n';
+        // ==================== EXPORT LOGSHEET TO EXCEL (ENHANCED VERSION) ====================
+function exportLogsheet() {
+    // Header kolom utama
+    const headers = [
+        ["No", "Description", "Parameter", "Unit", "Range",
+         "Unit1_09:30", "Unit1_12:00", "Unit1_15:00", "Unit1_18:00", "Unit1_21:00",
+         "Unit2_09:30", "Unit2_12:00", "Unit2_15:00", "Unit2_18:00", "Unit2_21:00",
+         "Unit3_09:30", "Unit3_12:00", "Unit3_15:00", "Unit3_18:00", "Unit3_21:00"]
+    ];
+
+    // Data baris dari logsheetData
+    const rows = logsheetData.map(item => [
+        item.no, item.description, item.parameter, item.unit, item.range,
+        item.unit1["0930"], item.unit1["1200"], item.unit1["1500"], item.unit1["1800"], item.unit1["2100"],
+        item.unit2["0930"], item.unit2["1200"], item.unit2["1500"], item.unit2["1800"], item.unit2["2100"],
+        item.unit3["0930"], item.unit3["1200"], item.unit3["1500"], item.unit3["1800"], item.unit3["2100"]
+    ]);
+
+    const ws = XLSX.utils.aoa_to_sheet([...headers, ...rows]);
+
+    // === Styling dasar (header bold) ===
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+        const col = XLSX.utils.encode_col(C);
+        const cell = ws[col + "1"];
+        if (cell) {
+            cell.s = {
+                font: { bold: true },
+                alignment: { horizontal: "center", vertical: "center" },
+                fill: { fgColor: { rgb: "E5E7EB" } }
+            };
+        }
+    }
+
+    // === Pewarnaan otomatis berdasarkan range ===
+    for (let R = 1; R <= range.e.r; ++R) {
+        const item = logsheetData[R - 1];
+        if (!item) continue;
+
+        const allUnits = ["unit1", "unit2", "unit3"];
+        const times = ["0930", "1200", "1500", "1800", "2100"];
+        let colIndex = 5; // mulai dari kolom ke-6 (0-based index)
+
+        allUnits.forEach(unit => {
+            times.forEach(time => {
+                const val = item[unit][time];
+                const cell = ws[XLSX.utils.encode_cell({ r: R + 1, c: colIndex })]; // +1 karena header
+                if (cell) {
+                    let bgColor = "D1FAE5"; // default hijau muda
+                    if (val === "" || val === undefined) bgColor = "E5E7EB"; // abu untuk kosong
+                    else if (!validateValue(val, item.range, item.unit)) bgColor = "FEE2E2"; // merah jika out of range
+
+                    cell.s = {
+                        alignment: { horizontal: "center", vertical: "center" },
+                        fill: { fgColor: { rgb: bgColor } }
+                    };
+                }
+                colIndex++;
             });
-            
+        });
+    }
+
+    // === Auto width kolom ===
+    const colWidths = [];
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+        let maxLen = 10;
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+            const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
+            if (cell && cell.v) {
+                const len = cell.v.toString().length;
+                if (len > maxLen) maxLen = len;
+            }
+        }
+        colWidths.push({ wch: maxLen + 2 });
+    }
+    ws["!cols"] = colWidths;
+
+    // === Sheet 2: Summary ===
+    const summary = [
+        ["Unit", "Normal (%)", "Out of Range (%)", "Kosong (%)", "Total Parameter"]
+    ];
+
+    const times = ["0930", "1200", "1500", "1800", "2100"];
+    const units = ["unit1", "unit2", "unit3"];
+
+    units.forEach(unit => {
+        let normal = 0, out = 0, empty = 0, total = 0;
+        logsheetData.forEach(item => {
+            times.forEach(t => {
+                const val = item[unit][t];
+                if (val === "" || val === undefined) empty++;
+                else if (validateValue(val, item.range, item.unit)) normal++;
+                else out++;
+                total++;
+            });
+        });
+        const normPct = ((normal / total) * 100).toFixed(1) + "%";
+        const outPct = ((out / total) * 100).toFixed(1) + "%";
+        const empPct = ((empty / total) * 100).toFixed(1) + "%";
+        summary.push([unit.toUpperCase(), normPct, outPct, empPct, total]);
+    });
+
+    const wsSummary = XLSX.utils.aoa_to_sheet(summary);
+
+    // Styling summary header
+    const sRange = XLSX.utils.decode_range(wsSummary['!ref']);
+    for (let C = sRange.s.c; C <= sRange.e.c; ++C) {
+        const col = XLSX.utils.encode_col(C);
+        const cell = wsSummary[col + "1"];
+        if (cell) {
+            cell.s = {
+                font: { bold: true },
+                fill: { fgColor: { rgb: "DBEAFE" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+        }
+    }
+
+    // Center semua data di summary
+    for (let R = 1; R <= sRange.e.r; ++R) {
+        for (let C = sRange.s.c; C <= sRange.e.c; ++C) {
+            const cell = wsSummary[XLSX.utils.encode_cell({ r: R + 1, c: C })];
+            if (cell) cell.s = { alignment: { horizontal: "center", vertical: "center" } };
+        }
+    }
+
+    // Auto width summary
+    wsSummary["!cols"] = [{ wch: 15 }, { wch: 15 }, { wch: 18 }, { wch: 15 }, { wch: 18 }];
+
+    // === Buat workbook dan export ===
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data Logsheet");
+    XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
+
+    const date = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `Logsheet_Chiller_${date}.xlsx`);
+
+    showNotification("✅ Logsheet & Summary berhasil diexport ke Excel!", "success");
+}
+        // ==================== EXPORT BULANAN KE EXCEL (DENGAN SUMMARY RATA-RATA) ====================
+function exportMonthlyLogsheet() {
+    const month = new Date(document.getElementById('dateSelect').value).toISOString().slice(0, 7); // contoh: 2025-11
+    const keys = Object.keys(localStorage).filter(k => k.startsWith(`logsheet_chiller_${month}`));
+
+    if (keys.length === 0) {
+        showNotification(`❌ Tidak ada data logsheet untuk bulan ${month}`, 'error');
+        return;
+    }
+
+    const wb = XLSX.utils.book_new();
+    let summaryData = [];
+
+    keys.sort(); // urutkan tanggal
+
+    keys.forEach(key => {
+        const date = key.replace('logsheet_chiller_', '');
+        const data = JSON.parse(localStorage.getItem(key));
+        const headers = [
+            ["No", "Description", "Parameter", "Unit", "Range",
+             "Unit1_09:30", "Unit1_12:00", "Unit1_15:00", "Unit1_18:00", "Unit1_21:00",
+             "Unit2_09:30", "Unit2_12:00", "Unit2_15:00", "Unit2_18:00", "Unit2_21:00",
+             "Unit3_09:30", "Unit3_12:00", "Unit3_15:00", "Unit3_18:00", "Unit3_21:00"]
+        ];
+
+        const rows = data.map(item => [
+            item.no, item.description, item.parameter, item.unit, item.range,
+            item.unit1["0930"], item.unit1["1200"], item.unit1["1500"], item.unit1["1800"], item.unit1["2100"],
+            item.unit2["0930"], item.unit2["1200"], item.unit2["1500"], item.unit2["1800"], item.unit2["2100"],
+            item.unit3["0930"], item.unit3["1200"], item.unit3["1500"], item.unit3["1800"], item.unit3["2100"]
+        ]);
+
+        const ws = XLSX.utils.aoa_to_sheet([...headers, ...rows]);
+        XLSX.utils.book_append_sheet(wb, ws, date);
+
+        // Buat ringkasan per tanggal per unit
+        const units = ["unit1", "unit2", "unit3"];
+        const times = ["0930", "1200", "1500", "1800", "2100"];
+
+        units.forEach(unit => {
+            let normal = 0, out = 0, empty = 0, total = 0;
+            data.forEach(item => {
+                times.forEach(t => {
+                    const val = item[unit][t];
+                    if (val === "" || val === undefined) empty++;
+                    else if (validateValue(val, item.range, item.unit)) normal++;
+                    else out++;
+                    total++;
+                });
+            });
+            summaryData.push({
+                tanggal: date,
+                unit: unit.toUpperCase(),
+                normal: normal,
+                out: out,
+                empty: empty,
+                total: total
+            });
+        });
+    });
+
+    // Buat sheet summary bulanan
+    const summarySheet = [
+        ["Tanggal", "Unit", "Normal (%)", "Out of Range (%)", "Kosong (%)", "Total Parameter"]
+    ];
+
+    // Data per hari
+    summaryData.forEach(s => {
+        const normalPct = ((s.normal / s.total) * 100).toFixed(1);
+        const outPct = ((s.out / s.total) * 100).toFixed(1);
+        const empPct = ((s.empty / s.total) * 100).toFixed(1);
+        summarySheet.push([s.tanggal, s.unit, `${normalPct}%`, `${outPct}%`, `${empPct}%`, s.total]);
+    });
+
+    // Hitung rata-rata per unit
+    const units = ["UNIT1", "UNIT2", "UNIT3"];
+    summarySheet.push([]); // baris kosong
+    summarySheet.push(["📊 RATA-RATA BULANAN", "", "", "", "", ""]);
+
+    units.forEach(unit => {
+        const dataPerUnit = summaryData.filter(s => s.unit === unit);
+        const totalHari = dataPerUnit.length;
+        if (totalHari > 0) {
+            const avgNormal = (dataPerUnit.reduce((a, b) => a + (b.normal / b.total) * 100, 0) / totalHari).toFixed(1);
+            const avgOut = (dataPerUnit.reduce((a, b) => a + (b.out / b.total) * 100, 0) / totalHari).toFixed(1);
+            const avgEmpty = (dataPerUnit.reduce((a, b) => a + (b.empty / b.total) * 100, 0) / totalHari).toFixed(1);
+            summarySheet.push(["", unit, `${avgNormal}%`, `${avgOut}%`, `${avgEmpty}%`, "Avg"]);
+        }
+    });
+
+    // Tambahkan ke workbook
+    const wsSummary = XLSX.utils.aoa_to_sheet(summarySheet);
+
+    // Format kolom
+    wsSummary["!cols"] = [{ wch: 15 }, { wch: 10 }, { wch: 15 }, { wch: 18 }, { wch: 15 }, { wch: 18 }];
+
+    XLSX.utils.book_append_sheet(wb, wsSummary, "Summary Bulanan");
+
+    const fileName = `Logsheet_Chiller_${month}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+
+    showNotification(`✅ Logsheet bulanan (${month}) berhasil diexport ke Excel dengan rekap rata-rata!`, "success");
+}
+
+
             // Add signature section with staff names and signatures
             csvContent += `\n\nTanda Tangan:\n`;
             csvContent += `Dibuat Oleh,Pic 09:30,Pic 12:00,Pic 15:00,Pic 18:00,Pic 21:00,Mengetahui\n`;
@@ -1437,3 +1644,4 @@
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'974e69cb204cf46d',t:'MTc1NjE1OTc2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
+
