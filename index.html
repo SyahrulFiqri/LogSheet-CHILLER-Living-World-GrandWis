@@ -445,1039 +445,664 @@
     </div>
 
     <script>
-        // Logsheet data structure with exact sequential numbering from Excel
-        const logsheetData = [
-            // Condenser Status (1-5)
-            { no: 1, section: 'Condenser status', description: 'Condenser status', parameter: 'Water In Temp.', unit: '°C', range: '27-31°C', 
-              unit1: { '0930': 29.7, '1200': 29.4, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 29.8, '1200': 29.4, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 29.7, '1200': 29.4, '1500': '', '1800': '', '2100': '' } },
-            { no: 2, section: '', description: '', parameter: 'Water Out Temp.', unit: '°C', range: '32-36°C',
-              unit1: { '0930': 34.4, '1200': 35.1, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 34.4, '1200': 34.6, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 34.4, '1200': 34.9, '1500': '', '1800': '', '2100': '' } },
-            { no: 3, section: '', description: '', parameter: 'Condenser Approach', unit: '°C', range: '<3.3°C',
-              unit1: { '0930': 1.7, '1200': 1.6, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 1.3, '1200': 1.0, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 0.8, '1200': 0.5, '1500': '', '1800': '', '2100': '' } },
-            { no: 4, section: '', description: '', parameter: 'Condenser Pressure', unit: 'Kpa', range: 'Low: >-30 kPa, High: <187 kPa',
-              unit1: { '0930': 88.2, '1200': 89.9, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 84.2, '1200': 84.2, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 81.7, '1200': 82.9, '1500': '', '1800': '', '2100': '' } },
-            { no: 5, section: '', description: '', parameter: 'Condenser Saturated Temp.', unit: '°C', range: '30-36°C',
-              unit1: { '0930': 36.3, '1200': 36.6, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 35.6, '1200': 35.6, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 35.2, '1200': 35.4, '1500': '', '1800': '', '2100': '' } },
-            
-            // Evaporator Status (9-14)
-            { no: 9, section: 'Evaporator Status', description: 'Evaporator Status', parameter: 'Water In Temp.', unit: '°C', range: '10-13°C',
-              unit1: { '0930': 18.2, '1200': 14.0, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 18.0, '1200': 14.0, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 17.7, '1200': 13.9, '1500': '', '1800': '', '2100': '' } },
-            { no: 10, section: '', description: '', parameter: 'Water Out Temp.', unit: '°C', range: '6-10°C',
-              unit1: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' } },
-            { no: 11, section: '', description: '', parameter: 'Evaporator Approach', unit: '°C', range: '<2.2°C',
-              unit1: { '0930': 0.1, '1200': 0.1, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 0.1, '1200': 0.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 0.1, '1200': 0.1, '1500': '', '1800': '', '2100': '' } },
-            { no: 12, section: '', description: '', parameter: 'Evaporator Pressure', unit: 'Kpa', range: 'Low: >-47 kPa, High: <187 kPa',
-              unit1: { '0930': -30.4, '1200': -38.2, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': -27.8, '1200': -36.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': -34.4, '1200': -40.0, '1500': '', '1800': '', '2100': '' } },
-            { no: 13, section: '', description: '', parameter: 'Evap Saturated Refrig Temp', unit: '°C', range: 'Low: >2.2°C, High: <15°C',
-              unit1: { '0930': 9.1, '1200': 6.2, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 10.0, '1200': 7.0, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 7.7, '1200': 5.5, '1500': '', '1800': '', '2100': '' } },
-            { no: 14, section: '', description: '', parameter: 'Evap Refrig Liquid Temp.', unit: '°C', range: '7-10°C',
-              unit1: { '0930': 13.5, '1200': 8.6, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 13.9, '1200': 8.9, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 13.4, '1200': 8.7, '1500': '', '1800': '', '2100': '' } },
-            
-            // Compressor Status (19-26)
-            { no: 19, section: 'Compressor Status', description: 'Compressor Status', parameter: 'Compressor Running Hour', unit: 'Hours', range: 'Actual',
-              unit1: { '0930': 1287.4, '1200': 1280.5, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 1279.1, '1200': 1281.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 1278.8, '1200': 1280.8, '1500': '', '1800': '', '2100': '' } },
-            { no: 20, section: '', description: '', parameter: 'Compressor Starts Number', unit: '', range: 'Actual',
-              unit1: { '0930': 141.0, '1200': 141.0, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 147.0, '1200': 147.0, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 140.0, '1200': 140.0, '1500': '', '1800': '', '2100': '' } },
-            { no: 21, section: '', description: '', parameter: 'Comp. Discharge Temp.', unit: '°C', range: '<50°C',
-              unit1: { '0930': 39.6, '1200': 38.9, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 39.9, '1200': 38.6, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 40.3, '1200': 38.3, '1500': '', '1800': '', '2100': '' } },
-            { no: 24, section: '', description: '', parameter: 'Discharge Superheat', unit: '°C', range: '<8°C',
-              unit1: { '0930': 3.4, '1200': 2.4, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 4.2, '1200': 2.9, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 5.1, '1200': 2.9, '1500': '', '1800': '', '2100': '' } },
-            { no: 25, section: '', description: '', parameter: 'Actual GV1 Position', unit: '%', range: '0-93',
-              unit1: { '0930': 92.8, '1200': 86.5, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 93.4, '1200': 93.4, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 93.5, '1200': 79.2, '1500': '', '1800': '', '2100': '' } },
-            { no: 26, section: '', description: '', parameter: 'Actual GV2 Position', unit: '%', range: '0-93',
-              unit1: { '0930': 93.2, '1200': 90.6, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 93.5, '1200': 93.4, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 93.5, '1200': 87.8, '1500': '', '1800': '', '2100': '' } },
-            
-            // Motor Status (27-30)
-            { no: 27, section: 'Motor Status', description: 'Motor Status', parameter: 'Motor Killowatts', unit: 'KW', range: 'Actual',
-              unit1: { '0930': 288.1, '1200': 296.4, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 287.3, '1200': 284.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 291.8, '1200': 279.2, '1500': '', '1800': '', '2100': '' } },
-            { no: 28, section: '', description: '', parameter: 'Motor current', unit: 'AMPS', range: 'Actual',
-              unit1: { '0930': 572.3, '1200': 561.3, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 570.9, '1200': 547.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 575.5, '1200': 533.4, '1500': '', '1800': '', '2100': '' } },
-            { no: 29, section: '', description: '', parameter: 'Percent Load Current', unit: '%', range: 'Actual',
-              unit1: { '0930': 99.5, '1200': 97.6, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 99.3, '1200': 95.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 100.1, '1200': 92.8, '1500': '', '1800': '', '2100': '' } },
-            { no: 30, section: '', description: '', parameter: 'Motor Winding 1 temp', unit: '°C', range: '<100°C',
-              unit1: { '0930': 35.9, '1200': 31.0, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 26.5, '1200': 24.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 30.4, '1200': 25.3, '1500': '', '1800': '', '2100': '' } },
-            
-            // VFD Status (31-35)
-            { no: 31, section: 'VFD Status', description: 'VFD Status', parameter: 'Actual Line Voltage', unit: 'Volts', range: 'Actual',
-              unit1: { '0930': 381.9, '1200': 383.6, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 382.6, '1200': 387.0, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 383.6, '1200': 387.4, '1500': '', '1800': '', '2100': '' } },
-            { no: 32, section: '', description: '', parameter: 'Actual Vfd Freq', unit: 'Hz', range: 'Actual',
-              unit1: { '0930': 78.7, '1200': 82.4, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 78.6, '1200': 80.9, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 79.6, '1200': 81.7, '1500': '', '1800': '', '2100': '' } },
-            { no: 33, section: '', description: '', parameter: 'Actual Vfd Speed', unit: '%', range: 'Actual',
-              unit1: { '0930': 96.3, '1200': 100.8, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 96.2, '1200': 99.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 97.4, '1200': 100.0, '1500': '', '1800': '', '2100': '' } },
-            { no: 34, section: '', description: '', parameter: 'Actual Line Current', unit: 'AMPS', range: 'Actual',
-              unit1: { '0930': 499.7, '1200': 501.6, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 693.7, '1200': 487.8, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 505.9, '1200': 477.1, '1500': '', '1800': '', '2100': '' } },
-            { no: 35, section: '', description: '', parameter: 'Vfd Load Current', unit: 'AMPS', range: 'Actual',
-              unit1: { '0930': 567.3, '1200': 556.9, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 567.9, '1200': 545.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 568.0, '1200': 530.4, '1500': '', '1800': '', '2100': '' } },
-            
-            // Purge System (36-38)
-            { no: 36, section: 'Purge Syst.', description: 'Purge Syst.', parameter: 'Total Pumpout Number', unit: '', range: 'Actual',
-              unit1: { '0930': 7.0, '1200': 7.0, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 9.0, '1200': 9.0, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 19.0, '1200': 19.0, '1500': '', '1800': '', '2100': '' } },
-            { no: 37, section: '', description: '', parameter: 'Purge Comp.Suction Temp.', unit: '°C', range: '-25-30°C',
-              unit1: { '0930': 23.0, '1200': 20.1, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 33.1, '1200': 34.0, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 11.3, '1200': 5.3, '1500': '', '1800': '', '2100': '' } },
-            { no: 38, section: '', description: '', parameter: 'Purge Inlet Temp.', unit: '°C', range: '<38°C',
-              unit1: { '0930': 36.3, '1200': 36.6, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 35.6, '1200': 35.8, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 35.2, '1200': 35.4, '1500': '', '1800': '', '2100': '' } },
-            
-            // Lubrication (39-46)
-            { no: 39, section: 'Lubrication', description: 'Lubrication', parameter: 'Bearing Ref. Suplay Sat. Temp.', unit: '°C', range: '30-60°C',
-              unit1: { '0930': 45.5, '1200': 45.6, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 43.1, '1200': 43.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 50.9, '1200': 51.2, '1500': '', '1800': '', '2100': '' } },
-            { no: 40, section: '', description: '', parameter: '1st Stage Bearing Temp.', unit: '°C', range: '40-50°C',
-              unit1: { '0930': 21.3, '1200': 19.9, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 18.6, '1200': 16.9, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 14.6, '1200': 12.5, '1500': '', '1800': '', '2100': '' } },
-            { no: 41, section: '', description: '', parameter: '2nd Stage Bearing Temp.', unit: '°C', range: '40-50°C',
-              unit1: { '0930': 28.2, '1200': 27.3, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 27.0, '1200': 26.3, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 27.7, '1200': 27.1, '1500': '', '1800': '', '2100': '' } },
-            { no: 42, section: '', description: '', parameter: 'Bearing Inlet Pressure', unit: 'Kpa', range: '60-180 kPa',
-              unit1: { '0930': 153.0, '1200': 152.9, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 135.2, '1200': 134.2, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 199.1, '1200': 202.3, '1500': '', '1800': '', '2100': '' } },
-            { no: 43, section: '', description: '', parameter: 'Bearing Outlet pressure', unit: 'Kpa', range: '3 - (-40) kPa',
-              unit1: { '0930': -17.9, '1200': -25.6, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': -19.7, '1200': -25.4, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 25.7, '1200': -30.4, '1500': '', '1800': '', '2100': '' } },
-            { no: 44, section: '', description: '', parameter: 'Pump Inlet Pressure', unit: 'Kpa', range: '>80 kPa',
-              unit1: { '0930': 94.8, '1200': 96.0, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 94.7, '1200': 96.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 92.9, '1200': 91.8, '1500': '', '1800': '', '2100': '' } },
-            { no: 45, section: '', description: '', parameter: 'Pump Outlet Pressure', unit: 'Kpa', range: '>100 kPa',
-              unit1: { '0930': 195.0, '1200': 194.7, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 168.8, '1200': 168.1, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 248.8, '1200': 249.2, '1500': '', '1800': '', '2100': '' } },
-            { no: 46, section: '', description: '', parameter: 'Ref Pump Amps', unit: 'Amps', range: '1.0-3.0',
-              unit1: { '0930': 100.2, '1200': 98.8, '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 74.1, '1200': 71.9, '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 155.9, '1200': 157.4, '1500': '', '1800': '', '2100': '' } },
-            
-            // Running Status (47-52)
-            { no: 47, section: 'Running Status', description: 'Running Status', parameter: 'Setpoint Chiller', unit: '°C', range: 'Actual',
-              unit1: { '0930': 8.0, '1200': 8.0, '1500': 8.0, '1800': 8.0, '2100': 8.0 },
-              unit2: { '0930': 8.0, '1200': 8.0, '1500': 8.0, '1800': 8.0, '2100': 8.0 },
-              unit3: { '0930': 8.0, '1200': 8.0, '1500': 8.0, '1800': 8.0, '2100': 8.0 } },
-            { no: 48, section: '', description: '', parameter: 'Fan Cooling Tower', unit: 'Unit', range: 'Actual',
-              unit1: { '0930': 4, '1200': 4, '1500': 4, '1800': 4, '2100': 4 },
-              unit2: { '0930': 4, '1200': 4, '1500': 4, '1800': 4, '2100': 4 },
-              unit3: { '0930': 4, '1200': 4, '1500': 4, '1800': 4, '2100': 4 } },
-            { no: 49, section: '', description: '', parameter: 'Freq CWP', unit: 'Hz', range: 'Actual',
-              unit1: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' } },
-            { no: 50, section: '', description: '', parameter: 'Freq CHWP', unit: 'Hz', range: 'Actual',
-              unit1: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' } },
-            { no: 51, section: '', description: '', parameter: 'Doshing Pump CT', unit: 'Unit', range: 'Actual',
-              unit1: { '0930': 1, '1200': '', '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': 1, '1200': '', '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': 1, '1200': '', '1500': '', '1800': '', '2100': '' } },
-            { no: 52, section: '', description: '', parameter: 'Doshing Pump Chiller', unit: 'Unit', range: 'Actual',
-              unit1: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
-              unit2: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
-              unit3: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' } }
-        ];
+/* ===========================
+   LOGSHEET DATA (your existing data)
+   =========================== */
+const logsheetData = [
+  /* <-- PASTE your full array here (same as you already have) --> */
+  // Example small snippet — replace with your full array:
+  { no: 1, section: 'Condenser status', description: 'Condenser status', parameter: 'Water In Temp.', unit: '°C', range: '27-31°C',
+    unit1: { '0930': 29.7, '1200': 29.4, '1500': '', '1800': '', '2100': '' },
+    unit2: { '0930': 29.8, '1200': 29.4, '1500': '', '1800': '', '2100': '' },
+    unit3: { '0930': 29.7, '1200': 29.4, '1500': '', '1800': '', '2100': '' } }
+  // ... full list continues (use the same content you already have)
+];
 
-// ==================== GENERATE UNIT CELLS ====================
-function generateUnitCells(unitData, range, unit, unitKey, rowNo) {
-    const times = ['0930', '1200', '1500', '1800', '2100'];
-    return times.map(time => {
-        const value = unitData[time];
-        const displayValue = value !== '' ? value : '';
-        const cellClass = validateValue(value, range, unit)
-            ? 'in-range'
-            : (value !== '' ? 'out-of-range' : '');
-        return `
-            <td class="border border-gray-300 p-1 text-center value-cell ${cellClass}">
-                <input 
-                    type="number" 
-                    step="0.1"
-                    value="${displayValue ?? ''}"
-                    onchange="updateValue(${rowNo}, '${unitKey}', '${time}', this.value)"
-                    class="w-16 text-center border rounded px-1 py-0.5 text-xs"
-                >
-            </td>`;
-    }).join('');
-}
-
-// ==================== VALIDASI RANGE ====================
-function validateValue(value, range, unit) {
-    if (value === '' || range === 'Actual') return true;
-    const num = parseFloat(value);
-    if (isNaN(num)) return true;
-
-    if (range.includes('-')) {
-        const [min, max] = range.replace(/[°C|kPa|%]/g, '').split('-').map(parseFloat);
-        return num >= min && num <= max;
-    }
-    if (range.includes('<')) {
-        const max = parseFloat(range.replace(/[<°C|kPa|%]/g, ''));
-        return num < max;
-    }
-    if (range.includes('>')) {
-        const min = parseFloat(range.replace(/[>°C|kPa|%]/g, ''));
-        return num > min;
-    }
-    return true;
-}
-        
-// ==================== PARAMETER SELECT MODAL ====================
-function populateParameterSelect() {
-    const select = document.getElementById('parameterSelect');
-    if (!select) return;
-    select.innerHTML = '<option value="">Pilih Parameter</option>';
-    logsheetData.forEach(item => {
-        if (item.parameter) {
-            const opt = document.createElement('option');
-            opt.value = item.no;
-            opt.textContent = `${item.no}. ${item.parameter}`;
-            select.appendChild(opt);
-        }
-    });
-}
-
-// ==================== STAFF DATA ====================
+/* ===========================
+   STAFF DATA (defaults)
+   =========================== */
 let staffData = {
-    '0930': '', '1200': '', '1500': '', '1800': '', '2100': '',
-    supervisor: '', manager: '',
-    signature0930: '', signature1200: '', signature1500: '', signature1800: '', signature2100: '',
-    supervisorSignature: '', managerSignature: ''
+  '0930': '', '1200': '', '1500': '', '1800': '', '2100': '',
+  supervisor: '', manager: '',
+  signature0930: '', signature1200: '', signature1500: '', signature1800: '', signature2100: '',
+  supervisorSignature: '', managerSignature: ''
 };
 
-function saveStaffData() {
-    const date = document.getElementById('dateSelect').value;
-    staffData = {
-        '0930': document.getElementById('staff0930').value,
-        '1200': document.getElementById('staff1200').value,
-        '1500': document.getElementById('staff1500').value,
-        '1800': document.getElementById('staff1800').value,
-        '2100': document.getElementById('staff2100').value,
-        supervisor: document.getElementById('supervisor').value,
-        manager: document.getElementById('manager').value,
-        signature0930: document.getElementById('signature0930').value,
-        signature1200: document.getElementById('signature1200').value,
-        signature1500: document.getElementById('signature1500').value,
-        signature1800: document.getElementById('signature1800').value,
-        signature2100: document.getElementById('signature2100').value,
-        supervisorSignature: document.getElementById('supervisorSignature').value,
-        managerSignature: document.getElementById('managerSignature').value
-    };
-    localStorage.setItem(`staff_data_${date}`, JSON.stringify(staffData));
-}
-
-function loadStaffData(date) {
-    const data = JSON.parse(localStorage.getItem(`staff_data_${date}`) || 'null');
-    if (data) {
-        Object.keys(data).forEach(k => {
-            const el = document.getElementById(k);
-            if (el) el.value = data[k];
-        });
-        staffData = data;
-    }
-}
-
-// ==================== TANGGAL DAN INISIALISASI ====================
-function updateDateTime() {
-    const now = new Date();
-    document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', {
-        day: 'numeric', month: 'long', year: 'numeric'
-    });
-    document.getElementById('lastUpdate').textContent =
-        now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-}
-
-function initializeLogsheet() {
-    populateLogsheetTable();
-    populateParameterSelect();
-    updateDateTime();
-    updateStatistics();
-    loadStaffData(document.getElementById('dateSelect').value);
-}
-
-window.addEventListener('DOMContentLoaded', initializeLogsheet);
-</script>
-
-       <script>
 /* ===========================
-   Helper: Notification toast
+   Helper: show notification (toast)
    =========================== */
 function showNotification(message, type = 'info', timeout = 2500) {
-    let container = document.getElementById('toastContainer');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toastContainer';
-        container.style.position = 'fixed';
-        container.style.right = '16px';
-        container.style.top = '16px';
-        container.style.zIndex = 9999;
-        document.body.appendChild(container);
-    }
-    const el = document.createElement('div');
-    el.textContent = message;
-    el.style.marginTop = '8px';
-    el.style.padding = '10px 14px';
-    el.style.borderRadius = '8px';
-    el.style.color = '#fff';
-    el.style.fontSize = '13px';
-    el.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
-    if (type === 'success') el.style.background = '#16a34a';
-    else if (type === 'error') el.style.background = '#dc2626';
-    else if (type === 'warning') el.style.background = '#d97706';
-    else el.style.background = '#0ea5e9';
-    container.appendChild(el);
-    setTimeout(() => { el.style.opacity = '0'; setTimeout(()=>el.remove(),400); }, timeout);
+  let container = document.getElementById('toastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toastContainer';
+    container.style.position = 'fixed';
+    container.style.right = '16px';
+    container.style.top = '16px';
+    container.style.zIndex = 9999;
+    document.body.appendChild(container);
+  }
+  const el = document.createElement('div');
+  el.textContent = message;
+  el.style.marginTop = '8px';
+  el.style.padding = '10px 14px';
+  el.style.borderRadius = '8px';
+  el.style.color = '#fff';
+  el.style.fontSize = '13px';
+  el.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
+  if (type === 'success') el.style.background = '#16a34a';
+  else if (type === 'error') el.style.background = '#dc2626';
+  else if (type === 'warning') el.style.background = '#d97706';
+  else el.style.background = '#0ea5e9';
+  container.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(()=>el.remove(),400); }, timeout);
 }
 
 /* ===========================
-   populate / render table
-   - Uses tbody id="logsheetTableBody"
-   - Creates inputs that call updateValue(...)
+   Validate value vs range (robust)
+   =========================== */
+function validateValue(value, range, unit) {
+  if (value === '' || value === undefined || range === 'Actual') return true;
+  const num = parseFloat(value);
+  if (isNaN(num)) return true;
+
+  // normalize range string to extract numbers
+  if (range.includes('-')) {
+    // e.g. "27-31°C" or "1.0-3.3"
+    const nums = range.replace(/[^\d\.\-\s]/g, '').split('-').map(s => parseFloat(s)).filter(n => !isNaN(n));
+    if (nums.length === 2) return num >= nums[0] && num <= nums[1];
+  }
+  if (range.includes('<')) {
+    const max = parseFloat(range.replace(/[^\d\.\-]/g, ''));
+    if (!isNaN(max)) return num < max;
+  }
+  if (range.includes('>')) {
+    const min = parseFloat(range.replace(/[^\d\.\-]/g, ''));
+    if (!isNaN(min)) return num > min;
+  }
+  return true;
+}
+
+/* ===========================
+   Generate unit cell HTML (input inside each cell)
+   - rowNo used to match item.no when updating
+   =========================== */
+function generateUnitCells(unitData, range, unit, unitKey, rowNo) {
+  const times = ['0930','1200','1500','1800','2100'];
+  return times.map(t => {
+    const val = unitData?.[t] ?? '';
+    const displayValue = (val === '' || val === null || val === undefined) ? '' : val;
+    const isValid = validateValue(displayValue, range, unit);
+    const cellClass = displayValue === '' ? '' : (isValid ? 'in-range' : 'out-of-range');
+    return `
+      <td class="border border-gray-300 p-1 text-center value-cell ${cellClass}">
+        <input type="number" step="0.1"
+               value="${displayValue ?? ''}"
+               onchange="updateValue(${rowNo}, '${unitKey}', '${t}', this.value)"
+               class="w-16 text-center border rounded px-1 py-0.5 text-xs">
+      </td>`;
+  }).join('');
+}
+
+/* ===========================
+   Populate main logsheet table
    =========================== */
 function populateLogsheetTable() {
-    const tbody = document.getElementById('logsheetTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
+  const tbody = document.getElementById('logsheetTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
 
-    logsheetData.forEach(item => {
-        const tr = document.createElement('tr');
-        // Section header styling if description equals section (you used this pattern)
-        const isSection = item.section && item.description === item.section;
-        if (isSection) tr.className = 'bg-gray-100 font-semibold';
+  logsheetData.forEach(item => {
+    const isSection = item.section && (item.description === item.section);
+    const tr = document.createElement('tr');
+    if (isSection) tr.className = 'section-header';
 
-        // Build cells
-        const noTd = `<td class="border border-gray-300 p-2 text-center">${item.no}</td>`;
-        const descTd = `<td class="border border-gray-300 p-2 ${isSection ? 'font-bold' : ''}">${item.description || ''}</td>`;
-        const paramTd = `<td class="border border-gray-300 p-2">${item.parameter || ''}</td>`;
-        const unitTd = `<td class="border border-gray-300 p-2 text-center">${item.unit || ''}</td>`;
-
-        // unit cells (3 units x 5 times)
-        const times = ['0930','1200','1500','1800','2100'];
-        function unitCells(unitKey) {
-            return times.map(t => {
-                const value = item[unitKey]?.[t] ?? '';
-                const display = value !== '' ? value : '';
-                // input value uses item.no as identifier for updateValue
-                return `
-                    <td class="border border-gray-300 p-1 text-center value-cell">
-                        <input type="number" step="0.1" 
-                            value="${display}" 
-                            onchange="updateValue(${item.no}, '${unitKey}', '${t}', this.value)"
-                            class="w-16 text-center border rounded px-1 py-0.5 text-xs">
-                    </td>`;
-            }).join('');
-        }
-
-        tr.innerHTML = noTd + descTd + paramTd + unitTd +
-                       unitCells('unit1') + unitCells('unit2') + unitCells('unit3') +
-                       `<td class="border border-gray-300 p-2 text-center text-xs"></td>`;
-
-        tbody.appendChild(tr);
-    });
+    tr.innerHTML = `
+      <td class="border border-gray-300 p-2 text-center">${item.no}</td>
+      <td class="border border-gray-300 p-2 ${isSection ? 'font-bold' : ''}">${item.description || ''}</td>
+      <td class="border border-gray-300 p-2">${item.parameter || ''}</td>
+      <td class="border border-gray-300 p-2 text-center">${item.unit || ''}</td>
+      ${generateUnitCells(item.unit1, item.range, item.unit, 'unit1', item.no)}
+      ${generateUnitCells(item.unit2, item.range, item.unit, 'unit2', item.no)}
+      ${generateUnitCells(item.unit3, item.range, item.unit, 'unit3', item.no)}
+      <td class="border border-gray-300 p-2 text-center text-xs"></td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
 /* ===========================
-   Update value & save
-   - rowNo matches item.no
-   - saves to storage (with metadata)
-   - updates statistics & UI
+   Update value (from inputs) & save
    =========================== */
 function updateValue(rowNo, unitKey, time, value) {
-    const idx = logsheetData.findIndex(i => i.no === rowNo);
-    if (idx === -1) return;
-    // normalize empty
-    logsheetData[idx][unitKey][time] = (value === '' ? '' : (isNaN(value) ? value : parseFloat(value)));
-    saveDataToStorage(); // persist
-    updateStatistics();
-    // update cell coloring: done on next populate; but we can update immediate by re-populating row
-    // simpler: re-populate table (fast enough)
-    populateLogsheetTable();
+  const idx = logsheetData.findIndex(i => i.no === rowNo);
+  if (idx === -1) return;
+  logsheetData[idx][unitKey][time] = (value === '' ? '' : (isNaN(value) ? value : parseFloat(value)));
+  saveDataToStorage();
+  updateStatistics();
+  // re-render to update colors/status
+  populateLogsheetTable();
 }
 
 /* ===========================
-   Save to localStorage (new format with metadata)
+   Save to localStorage (with metadata)
    =========================== */
 function saveDataToStorage() {
-    const currentDate = document.getElementById('dateSelect').value;
-    const storageKey = `logsheet_chiller_${currentDate}`;
-    const saveTime = new Date().toISOString();
+  const date = document.getElementById('dateSelect')?.value;
+  if (!date) return;
+  const key = `logsheet_chiller_${date}`;
+  const ts = new Date().toISOString();
+  const payload = {
+    version: '2.0',
+    timestamp: ts,
+    date,
+    data: logsheetData,
+    metadata: { facility: 'Mall Living World Grand Wisata', lastModified: ts }
+  };
+  localStorage.setItem(key, JSON.stringify(payload));
+  localStorage.setItem('logsheet_last_save', ts);
+  const lastSaveEl = document.getElementById('lastSaveTime');
+  if (lastSaveEl) lastSaveEl.textContent = new Date(ts).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
 
-    const dataToSave = {
-        version: '2.0',
-        timestamp: saveTime,
-        date: currentDate,
-        data: logsheetData,
-        metadata: {
-            lastModified: saveTime,
-            facility: 'Mall Living World Grand Wisata'
-        }
-    };
-
-    localStorage.setItem(storageKey, JSON.stringify(dataToSave));
-    localStorage.setItem('logsheet_last_save', saveTime);
-
-    const lastSaveEl = document.getElementById('lastSaveTime');
-    if (lastSaveEl) {
-        lastSaveEl.textContent = new Date(saveTime).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
-    }
-
-    const saveStatus = document.getElementById('autoSaveStatus');
-    if (saveStatus) {
-        saveStatus.textContent = 'Tersimpan';
-        saveStatus.className = 'text-green-600 pulse-save';
-        setTimeout(()=> { saveStatus.className = 'text-green-600'; }, 2000);
-    }
+  const saveStatus = document.getElementById('autoSaveStatus');
+  if (saveStatus) {
+    saveStatus.textContent = 'Tersimpan';
+    saveStatus.className = 'text-green-600 pulse-save';
+    setTimeout(()=> saveStatus.className = 'text-green-600', 2000);
+  }
 }
 
 /* ===========================
-   Load data for date
-   - supports old format (raw array) and new { data: [...] }
+   Load data for a date (handles old/new format)
    =========================== */
 function loadDataForDate(date) {
-    if (!date) return;
-    const storageKey = `logsheet_chiller_${date}`;
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-        try {
-            const parsed = JSON.parse(saved);
-            const dataArray = parsed.data || parsed;
-            // update only unit fields (keep other properties)
-            dataArray.forEach((savedItem, i) => {
-                if (logsheetData[i]) {
-                    if (savedItem.unit1) logsheetData[i].unit1 = savedItem.unit1;
-                    if (savedItem.unit2) logsheetData[i].unit2 = savedItem.unit2;
-                    if (savedItem.unit3) logsheetData[i].unit3 = savedItem.unit3;
-                }
-            });
-            populateLogsheetTable();
-            updateStatistics();
-            showNotification(`Data untuk ${date} berhasil dimuat!`, 'success');
-        } catch (e) {
-            console.error(e);
-            showNotification('Error loading data for this date', 'error');
-        }
-    } else {
-        resetToDefaultValues();
-        populateLogsheetTable();
-        updateStatistics();
-    }
+  if (!date) return;
+  const key = `logsheet_chiller_${date}`;
+  const raw = localStorage.getItem(key);
+  if (!raw) {
+    resetToDefaultValues();
+    populateLogsheetTable();
+    updateStatistics();
+    return;
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    const arr = parsed.data || parsed;
+    arr.forEach((savedItem, i) => {
+      if (!logsheetData[i]) return;
+      if (savedItem.unit1) logsheetData[i].unit1 = savedItem.unit1;
+      if (savedItem.unit2) logsheetData[i].unit2 = savedItem.unit2;
+      if (savedItem.unit3) logsheetData[i].unit3 = savedItem.unit3;
+    });
+    populateLogsheetTable();
+    updateStatistics();
+    showNotification(`Data untuk ${date} berhasil dimuat!`, 'success');
+  } catch (e) {
+    console.error(e);
+    showNotification('Error loading data for this date', 'error');
+  }
 }
 
 /* ===========================
-   Reset units to default '' (except some params if needed)
+   Reset default values (clears non-exempt parameters)
    =========================== */
 function resetToDefaultValues() {
-    logsheetData.forEach(item => {
-        ['unit1','unit2','unit3'].forEach(unit => {
-            ['0930','1200','1500','1800','2100'].forEach(time => {
-                if (item[unit] && item[unit][time] !== undefined) {
-                    // keep values for some parameters if you want; currently reset all except specific ones
-                    if (item.parameter === 'Setpoint Chiller' || item.parameter === 'Fan Cooling Tower') {
-                        // keep existing
-                    } else {
-                        item[unit][time] = '';
-                    }
-                }
-            });
-        });
+  logsheetData.forEach(item => {
+    ['unit1','unit2','unit3'].forEach(unit => {
+      ['0930','1200','1500','1800','2100'].forEach(time => {
+        if (item[unit] && item[unit][time] !== undefined) {
+          if (item.parameter === 'Setpoint Chiller' || item.parameter === 'Fan Cooling Tower') {
+            // keep defaults
+          } else {
+            item[unit][time] = '';
+          }
+        }
+      });
     });
+  });
 }
 
 /* ===========================
-   Load last save time
+   Load last save time to UI
    =========================== */
 function loadLastSaveTime() {
-    const last = localStorage.getItem('logsheet_last_save');
-    if (last) {
-        const el = document.getElementById('lastSaveTime');
-        if (el) el.textContent = new Date(last).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
-    }
+  const last = localStorage.getItem('logsheet_last_save');
+  if (last) {
+    const el = document.getElementById('lastSaveTime');
+    if (el) el.textContent = new Date(last).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+  }
+}
+
+/* ===========================
+   Statistics & small dashboard updates
+   =========================== */
+function updateStatistics() {
+  let total = 0, filled = 0, outOfRange = 0, totalLoad = 0, loadCount = 0;
+  logsheetData.forEach(item => {
+    if (!item.parameter) return;
+    ['unit1','unit2','unit3'].forEach(u => {
+      ['0930','1200','1500','1800','2100'].forEach(t => {
+        total++;
+        const v = item[u][t];
+        if (v !== '' && v !== undefined) {
+          filled++;
+          if (!validateValue(v, item.range, item.unit)) outOfRange++;
+          if (item.parameter === 'Percent Load Current') {
+            totalLoad += parseFloat(v) || 0;
+            loadCount++;
+          }
+        }
+      });
+    });
+  });
+  const completion = total ? ((filled/total)*100).toFixed(1) : '0.0';
+  const avgLoad = loadCount ? (totalLoad/loadCount).toFixed(1) : '0.0';
+  const compEl = document.getElementById('completionRate');
+  const warnEl = document.getElementById('warningParams');
+  const avgEl = document.getElementById('avgLoad');
+  const sysEl = document.getElementById('systemStatus');
+  if (compEl) compEl.textContent = `${completion}%`;
+  if (warnEl) warnEl.textContent = outOfRange;
+  if (avgEl) avgEl.textContent = `${avgLoad}%`;
+  if (sysEl) {
+    const statusText = outOfRange === 0 ? '🟢 Normal' : (outOfRange <= 3 ? '🟡 Perhatian' : '🔴 Critical');
+    sysEl.textContent = statusText;
+  }
 }
 
 /* ===========================
    Parameter select population
    =========================== */
 function populateParameterSelect() {
-    const sel = document.getElementById('parameterSelect');
-    if (!sel) return;
-    sel.innerHTML = '<option value="">Pilih Parameter</option>';
-    logsheetData.forEach(item => {
-        if (item.parameter) {
-            const opt = document.createElement('option');
-            opt.value = item.no;
-            opt.textContent = `${item.no}. ${item.parameter}`;
-            sel.appendChild(opt);
-        }
-    });
+  const sel = document.getElementById('parameterSelect');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Pilih Parameter</option>';
+  logsheetData.forEach(item => {
+    if (item.parameter) {
+      const opt = document.createElement('option');
+      opt.value = item.no;
+      opt.textContent = `${item.no}. ${item.parameter}`;
+      sel.appendChild(opt);
+    }
+  });
 }
 
 /* ===========================
-   Validate value vs range (basic parsing)
+   Staff data save/load
    =========================== */
-function validateValue(value, range, unit) {
-    if (value === '' || value === undefined || range === 'Actual') return true;
-    const num = parseFloat(value);
-    if (isNaN(num)) return true;
-    // handle ranges like "27-31°C" -> 27 and 31
-    if (range.includes('-')) {
-        const pair = range.replace(/[^\d\-\.\s]/g,'').split('-').map(s => parseFloat(s)).filter(n=>!isNaN(n));
-        if (pair.length === 2) {
-            return num >= pair[0] && num <= pair[1];
-        }
-    }
-    if (range.includes('<')) {
-        const max = parseFloat(range.replace(/[^\d\.\-]/g,''));
-        if (!isNaN(max)) return num < max;
-    }
-    if (range.includes('>')) {
-        const min = parseFloat(range.replace(/[^\d\.\-]/g,''));
-        if (!isNaN(min)) return num > min;
-    }
-    return true;
-}
-
-/* ===========================
-   Statistics panel updater
-   - updates elements: #completionRate, #warningParams, #avgLoad, #systemStatus
-   =========================== */
-function updateStatistics() {
-    let total = 0, filled = 0, out = 0, totalLoad = 0, loadCount = 0;
-    logsheetData.forEach(item => {
-        if (!item.parameter) return;
-        ['unit1','unit2','unit3'].forEach(u => {
-            ['0930','1200','1500','1800','2100'].forEach(t => {
-                total++;
-                const v = item[u][t];
-                if (v !== '' && v !== undefined) {
-                    filled++;
-                    if (!validateValue(v, item.range, item.unit)) out++;
-                    if (item.parameter === 'Percent Load Current') { totalLoad += parseFloat(v); loadCount++; }
-                }
-            });
-        });
-    });
-    const completion = total ? ((filled/total)*100).toFixed(1) : '0.0';
-    const avgLoad = loadCount ? (totalLoad/loadCount).toFixed(1) : '0.0';
-    const statusText = out === 0 ? '🟢 Normal' : (out <= 3 ? '🟡 Perhatian' : '🔴 Critical');
-
-    const elCompletion = document.getElementById('completionRate');
-    if (elCompletion) elCompletion.textContent = `${completion}%`;
-    const elWarn = document.getElementById('warningParams');
-    if (elWarn) elWarn.textContent = out;
-    const elAvg = document.getElementById('avgLoad');
-    if (elAvg) elAvg.textContent = `${avgLoad}%`;
-    const elStatus = document.getElementById('systemStatus');
-    if (elStatus) elStatus.textContent = statusText;
-}
-
-/* ===========================
-   Staff data functions
-   =========================== */
-let staffData = {
-    '0930':'','1200':'','1500':'','1800':'','2100':'',
-    supervisor:'', manager:'',
-    signature0930:'', signature1200:'', signature1500:'', signature1800:'', signature2100:'',
-    supervisorSignature:'', managerSignature:''
-};
-
 function saveStaffData() {
-    const date = document.getElementById('dateSelect').value;
-    staffData = {
-        '0930': document.getElementById('staff0930') ? document.getElementById('staff0930').value : '',
-        '1200': document.getElementById('staff1200') ? document.getElementById('staff1200').value : '',
-        '1500': document.getElementById('staff1500') ? document.getElementById('staff1500').value : '',
-        '1800': document.getElementById('staff1800') ? document.getElementById('staff1800').value : '',
-        '2100': document.getElementById('staff2100') ? document.getElementById('staff2100').value : '',
-        supervisor: document.getElementById('supervisor') ? document.getElementById('supervisor').value : '',
-        manager: document.getElementById('manager') ? document.getElementById('manager').value : '',
-        signature0930: document.getElementById('signature0930') ? document.getElementById('signature0930').value : '',
-        signature1200: document.getElementById('signature1200') ? document.getElementById('signature1200').value : '',
-        signature1500: document.getElementById('signature1500') ? document.getElementById('signature1500').value : '',
-        signature1800: document.getElementById('signature1800') ? document.getElementById('signature1800').value : '',
-        signature2100: document.getElementById('signature2100') ? document.getElementById('signature2100').value : '',
-        supervisorSignature: document.getElementById('supervisorSignature') ? document.getElementById('supervisorSignature').value : '',
-        managerSignature: document.getElementById('managerSignature') ? document.getElementById('managerSignature').value : ''
-    };
-    localStorage.setItem(`staff_data_${date}`, JSON.stringify(staffData));
-    showNotification('Data petugas tersimpan!', 'success');
+  const date = document.getElementById('dateSelect')?.value;
+  if (!date) return;
+  staffData = {
+    '0930': document.getElementById('staff0930')?.value || '',
+    '1200': document.getElementById('staff1200')?.value || '',
+    '1500': document.getElementById('staff1500')?.value || '',
+    '1800': document.getElementById('staff1800')?.value || '',
+    '2100': document.getElementById('staff2100')?.value || '',
+    supervisor: document.getElementById('supervisor')?.value || '',
+    manager: document.getElementById('manager')?.value || '',
+    signature0930: document.getElementById('signature0930')?.value || '',
+    signature1200: document.getElementById('signature1200')?.value || '',
+    signature1500: document.getElementById('signature1500')?.value || '',
+    signature1800: document.getElementById('signature1800')?.value || '',
+    signature2100: document.getElementById('signature2100')?.value || '',
+    supervisorSignature: document.getElementById('supervisorSignature')?.value || '',
+    managerSignature: document.getElementById('managerSignature')?.value || ''
+  };
+  localStorage.setItem(`staff_data_${date}`, JSON.stringify(staffData));
+  showNotification('Data petugas tersimpan!', 'success');
 }
 
 function loadStaffData(date) {
-    if (!date) return;
-    const raw = localStorage.getItem(`staff_data_${date}`);
-    if (raw) {
-        try {
-            const data = JSON.parse(raw);
-            Object.keys(data).forEach(k => {
-                const el = document.getElementById(k);
-                if (el) el.value = data[k];
-            });
-            staffData = data;
-        } catch(e) { console.error(e); }
-    } else {
-        // clear fields
-        ['staff0930','staff1200','staff1500','staff1800','staff2100',
-         'supervisor','manager',
-         'signature0930','signature1200','signature1500','signature1800','signature2100',
-         'supervisorSignature','managerSignature'].forEach(id => {
-             const el = document.getElementById(id);
-             if (el) el.value = '';
-         });
-        staffData = { '0930':'','1200':'','1500':'','1800':'','2100':'', supervisor:'', manager:'', signature0930:'', signature1200:'', signature1500:'', signature1800:'', signature2100:'', supervisorSignature:'', managerSignature:'' };
-    }
+  if (!date) return;
+  const raw = localStorage.getItem(`staff_data_${date}`);
+  if (!raw) {
+    // clear fields
+    ['staff0930','staff1200','staff1500','staff1800','staff2100','supervisor','manager','signature0930','signature1200','signature1500','signature1800','signature2100','supervisorSignature','managerSignature']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    staffData = { '0930':'','1200':'','1500':'','1800':'','2100':'', supervisor:'', manager:'', signature0930:'', signature1200:'', signature1500:'', signature1800:'', signature2100:'', supervisorSignature:'', managerSignature:'' };
+    return;
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    Object.keys(parsed).forEach(k => {
+      const el = document.getElementById(k);
+      if (el) el.value = parsed[k] || '';
+    });
+    staffData = parsed;
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 /* ===========================
-   Export functions (ke XLSX)
-   - exportLogsheet() and exportMonthlyLogsheet()
-   - Reused your existing logic, integrated with current data structure
+   Input modal open/close
+   =========================== */
+function inputData() { document.getElementById('inputModal')?.classList.remove('hidden'); }
+function closeInputModal() {
+  document.getElementById('inputModal')?.classList.add('hidden');
+  document.getElementById('inputForm')?.reset();
+}
+
+/* ===========================
+   Handle input form submission
+   =========================== */
+document.addEventListener('submit', function(e){
+  if (e.target && e.target.id === 'inputForm') {
+    e.preventDefault();
+    const paramNo = document.getElementById('parameterSelect')?.value;
+    const unit = document.getElementById('unitInput')?.value;
+    const time = document.getElementById('timeInput')?.value;
+    const rawVal = document.getElementById('valueInput')?.value;
+    const value = rawVal === '' ? '' : parseFloat(rawVal);
+    if (paramNo && unit && time && (rawVal !== '')) {
+      const item = logsheetData.find(i => i.no == paramNo);
+      if (item) {
+        item[unit][time] = isNaN(value) ? rawVal : value;
+        populateLogsheetTable();
+        updateStatistics();
+        saveDataToStorage();
+        closeInputModal();
+        showNotification('Data berhasil disimpan!', 'success');
+      }
+    } else showNotification('Mohon lengkapi semua field!', 'error');
+  }
+});
+
+/* ===========================
+   Quick Input Mode
+   =========================== */
+function quickInputMode() {
+  document.getElementById('quickInputModal')?.classList.remove('hidden');
+  populateQuickInputTable();
+}
+function closeQuickInputModal() { document.getElementById('quickInputModal')?.classList.add('hidden'); }
+function populateQuickInputTable() {
+  const tbody = document.getElementById('quickInputTableBody');
+  if (!tbody) return;
+  const selectedUnit = document.getElementById('quickUnitSelect')?.value || 'unit1';
+  const selectedTime = document.getElementById('quickTimeSelect')?.value || '0930';
+  tbody.innerHTML = '';
+  logsheetData.forEach(item => {
+    if (!item.parameter) return;
+    const currentValue = item[selectedUnit]?.[selectedTime] ?? '';
+    const isValid = validateValue(currentValue, item.range, item.unit);
+    const statusClass = currentValue === '' ? 'bg-gray-100' : (isValid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800');
+    const statusText = currentValue === '' ? 'Belum diisi' : (isValid ? '✅ Normal' : '⚠️ Di luar range');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td class="border border-gray-300 p-2 text-center">${item.no}</td>
+      <td class="border border-gray-300 p-2">${item.parameter}</td>
+      <td class="border border-gray-300 p-2 text-center">${item.unit}</td>
+      <td class="border border-gray-300 p-2 text-xs">${item.range}</td>
+      <td class="border border-gray-300 p-2 text-center">
+        <input type="number" step="0.1" value="${currentValue ?? ''}"
+          data-param="${item.no}" data-unit="${selectedUnit}" data-time="${selectedTime}"
+          class="w-full text-center border-0 bg-transparent focus:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
+          onkeydown="handleQuickInputKeydown(event)" onblur="updateQuickInputValue(this)">
+      </td>
+      <td class="border border-gray-300 p-2 text-center">
+        <span class="px-2 py-1 rounded text-xs ${statusClass}">${statusText}</span>
+      </td>`;
+    tbody.appendChild(row);
+  });
+}
+function handleQuickInputKeydown(event) {
+  if (event.key === 'Enter') { updateQuickInputValue(event.target); event.target.blur(); }
+  else if (event.key === 'Escape') { event.target.blur(); }
+}
+function updateQuickInputValue(input) {
+  const paramNo = input.dataset.param;
+  const unit = input.dataset.unit;
+  const time = input.dataset.time;
+  const raw = input.value;
+  const value = raw === '' ? '' : parseFloat(raw);
+  const item = logsheetData.find(i => i.no == paramNo);
+  if (!item) return;
+  item[unit][time] = raw === '' ? '' : (isNaN(value) ? raw : value);
+  saveDataToStorage();
+  // update status cell
+  const row = input.closest('tr');
+  const span = row?.querySelector('td:last-child span');
+  const valid = validateValue(item[unit][time], item.range, item.unit);
+  if (span) {
+    if (item[unit][time] === '') { span.className = 'px-2 py-1 rounded text-xs bg-gray-100'; span.textContent = 'Belum diisi'; }
+    else if (valid) { span.className = 'px-2 py-1 rounded text-xs bg-green-100 text-green-800'; span.textContent = '✅ Normal'; }
+    else { span.className = 'px-2 py-1 rounded text-xs bg-red-100 text-red-800'; span.textContent = '⚠️ Di luar range'; }
+  }
+}
+function saveAllQuickInput() {
+  populateLogsheetTable();
+  updateStatistics();
+  showNotification('Semua data berhasil disimpan!', 'success');
+}
+document.getElementById('quickUnitSelect')?.addEventListener('change', populateQuickInputTable);
+document.getElementById('quickTimeSelect')?.addEventListener('change', populateQuickInputTable);
+
+/* ===========================
+   Misc utilities and buttons
+   =========================== */
+function refreshData() {
+  updateDateTime();
+  populateLogsheetTable();
+  updateStatistics();
+  showNotification('Data berhasil diperbarui!', 'success');
+}
+function printLogsheet(){ window.print(); }
+
+/* ===========================
+   Copy from previous day
+   =========================== */
+function copyFromPreviousDay(){
+  const currentDate = document.getElementById('dateSelect')?.value;
+  if (!currentDate) return;
+  const prev = new Date(currentDate); prev.setDate(prev.getDate() - 1);
+  const prevKey = `logsheet_chiller_${prev.toISOString().slice(0,10)}`;
+  const raw = localStorage.getItem(prevKey);
+  if (!raw) { showNotification(`Tidak ada data untuk tanggal ${prev.toISOString().slice(0,10)}`,'error'); return; }
+  try {
+    const parsed = JSON.parse(raw);
+    const arr = parsed.data || parsed;
+    arr.forEach((s,i) => {
+      if (!logsheetData[i]) return;
+      // copy only some params if you prefer; here we copy everything
+      logsheetData[i].unit1 = s.unit1 || logsheetData[i].unit1;
+      logsheetData[i].unit2 = s.unit2 || logsheetData[i].unit2;
+      logsheetData[i].unit3 = s.unit3 || logsheetData[i].unit3;
+    });
+    populateLogsheetTable();
+    saveDataToStorage();
+    showNotification('Data template dari kemarin berhasil disalin!','success');
+  } catch (e) { console.error(e); showNotification('Error copying previous day', 'error'); }
+}
+
+/* ===========================
+   Export to Excel (basic) - uses SheetJS (xlsx) already included
    =========================== */
 function exportLogsheet() {
-    // header
-    const headers = [["No","Description","Parameter","Unit","Range",
+  const headers = [["No","Description","Parameter","Unit","Range",
+    "Unit1_09:30","Unit1_12:00","Unit1_15:00","Unit1_18:00","Unit1_21:00",
+    "Unit2_09:30","Unit2_12:00","Unit2_15:00","Unit2_18:00","Unit2_21:00",
+    "Unit3_09:30","Unit3_12:00","Unit3_15:00","Unit3_18:00","Unit3_21:00"]];
+  const rows = logsheetData.map(it => [
+    it.no, it.description, it.parameter, it.unit, it.range,
+    it.unit1["0930"], it.unit1["1200"], it.unit1["1500"], it.unit1["1800"], it.unit1["2100"],
+    it.unit2["0930"], it.unit2["1200"], it.unit2["1500"], it.unit2["1800"], it.unit2["2100"],
+    it.unit3["0930"], it.unit3["1200"], it.unit3["1500"], it.unit3["1800"], it.unit3["2100"]
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([...headers, ...rows]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Data Logsheet");
+  const date = document.getElementById('dateSelect')?.value || new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Logsheet_Chiller_${date}.xlsx`);
+  showNotification('✅ Logsheet berhasil diexport!', 'success');
+}
+
+/* ===========================
+   Export monthly - reads localStorage keys for month
+   =========================== */
+function exportMonthlyLogsheet() {
+  const dateVal = document.getElementById('dateSelect')?.value;
+  if (!dateVal) { showNotification('Pilih tanggal terlebih dahulu','error'); return; }
+  const month = dateVal.slice(0,7); // yyyy-mm
+  const keys = Object.keys(localStorage).filter(k => k.startsWith(`logsheet_chiller_${month}`));
+  if (!keys.length) { showNotification(`Tidak ada data bulan ${month}`,'error'); return; }
+  const wb = XLSX.utils.book_new();
+  keys.sort().forEach(k => {
+    const raw = localStorage.getItem(k);
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw);
+      const arr = parsed.data || parsed;
+      const headers = [["No","Description","Parameter","Unit","Range",
         "Unit1_09:30","Unit1_12:00","Unit1_15:00","Unit1_18:00","Unit1_21:00",
         "Unit2_09:30","Unit2_12:00","Unit2_15:00","Unit2_18:00","Unit2_21:00",
         "Unit3_09:30","Unit3_12:00","Unit3_15:00","Unit3_18:00","Unit3_21:00"]];
-    const rows = logsheetData.map(item => [
-        item.no, item.description || '', item.parameter || '', item.unit || '', item.range || '',
-        item.unit1["0930"], item.unit1["1200"], item.unit1["1500"], item.unit1["1800"], item.unit1["2100"],
-        item.unit2["0930"], item.unit2["1200"], item.unit2["1500"], item.unit2["1800"], item.unit2["2100"],
-        item.unit3["0930"], item.unit3["1200"], item.unit3["1500"], item.unit3["1800"], item.unit3["2100"]
-    ]);
-    const ws = XLSX.utils.aoa_to_sheet([...headers, ...rows]);
-
-    // auto widths
-    const range = XLSX.utils.decode_range(ws['!ref']);
-    const colWidths = [];
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-        let maxLen = 8;
-        for (let R = range.s.r; R <= range.e.r; ++R) {
-            const cell = ws[XLSX.utils.encode_cell({r:R,c:C})];
-            if (cell && cell.v) {
-                const len = String(cell.v).length;
-                if (len > maxLen) maxLen = len;
-            }
-        }
-        colWidths.push({wch: maxLen + 2});
-    }
-    ws['!cols'] = colWidths;
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Data Logsheet');
-
-    // Summary sheet
-    const summary = [["Unit","Normal (%)","Out of Range (%)","Kosong (%)","Total Parameter"]];
-    const timesArr = ["0930","1200","1500","1800","2100"];
-    ['unit1','unit2','unit3'].forEach(unit => {
-        let normal=0,out=0,empty=0,total=0;
-        logsheetData.forEach(item=>{
-            timesArr.forEach(t=>{
-                const v = item[unit][t];
-                if (v === '' || v === undefined) empty++;
-                else if (validateValue(v, item.range, item.unit)) normal++;
-                else out++;
-                total++;
-            });
-        });
-        summary.push([unit.toUpperCase(), ((normal/total)*100).toFixed(1)+'%', ((out/total)*100).toFixed(1)+'%', ((empty/total)*100).toFixed(1)+'%', total]);
-    });
-    const wsS = XLSX.utils.aoa_to_sheet(summary);
-    XLSX.utils.book_append_sheet(wb, wsS, 'Summary');
-
-    const date = document.getElementById('dateSelect').value || (new Date().toISOString().slice(0,10));
-    XLSX.writeFile(wb, `Logsheet_Chiller_${date}.xlsx`);
-    showNotification('✅ Logsheet berhasil diexport!', 'success');
-}
-
-function exportMonthlyLogsheet() {
-    const month = new Date(document.getElementById('dateSelect').value).toISOString().slice(0,7);
-    const keys = Object.keys(localStorage).filter(k => k.startsWith(`logsheet_chiller_${month}`));
-    if (keys.length === 0) { showNotification(`❌ Tidak ada data untuk bulan ${month}`, 'error'); return; }
-    const wb = XLSX.utils.book_new();
-    let summaryData = [];
-    keys.sort();
-    keys.forEach(key => {
-        const date = key.replace('logsheet_chiller_','');
-        const raw = localStorage.getItem(key);
-        if (!raw) return;
-        let parsed; try { parsed = JSON.parse(raw); } catch(e){ parsed = null; }
-        const data = parsed?.data || parsed || [];
-        const headers = [["No","Description","Parameter","Unit","Range",
-            "Unit1_09:30","Unit1_12:00","Unit1_15:00","Unit1_18:00","Unit1_21:00",
-            "Unit2_09:30","Unit2_12:00","Unit2_15:00","Unit2_18:00","Unit2_21:00",
-            "Unit3_09:30","Unit3_12:00","Unit3_15:00","Unit3_18:00","Unit3_21:00"]];
-        const rows = data.map(item => [
-            item.no, item.description || '', item.parameter || '', item.unit || '', item.range || '',
-            item.unit1["0930"], item.unit1["1200"], item.unit1["1500"], item.unit1["1800"], item.unit1["2100"],
-            item.unit2["0930"], item.unit2["1200"], item.unit2["1500"], item.unit2["1800"], item.unit2["2100"],
-            item.unit3["0930"], item.unit3["1200"], item.unit3["1500"], item.unit3["1800"], item.unit3["2100"]
-        ]);
-        const ws = XLSX.utils.aoa_to_sheet([...headers, ...rows]);
-        XLSX.utils.book_append_sheet(wb, ws, date.slice(5)); // sheet name use MM-DD or date (avoid too long)
-        // summary per date
-        ['unit1','unit2','unit3'].forEach(unit=>{
-            let normal=0,out=0,empty=0,total=0;
-            data.forEach(item=>{
-                ['0930','1200','1500','1800','2100'].forEach(t=>{
-                    const v = item[unit][t];
-                    if (v === '' || v === undefined) empty++;
-                    else if (validateValue(v, item.range, item.unit)) normal++;
-                    else out++;
-                    total++;
-                });
-            });
-            summaryData.push({tanggal:date, unit:unit.toUpperCase(), normal, out, empty, total});
-        });
-    });
-
-    const summarySheet = [["Tanggal","Unit","Normal (%)","Out of Range (%)","Kosong (%)","Total Parameter"]];
-    summaryData.forEach(s => {
-        summarySheet.push([s.tanggal, s.unit, ((s.normal/s.total)*100).toFixed(1)+'%', ((s.out/s.total)*100).toFixed(1)+'%', ((s.empty/s.total)*100).toFixed(1)+'%', s.total]);
-    });
-    // averages
-    summarySheet.push([]);
-    summarySheet.push(["📊 RATA-RATA BULANAN", "","","","",""]);
-    ['UNIT1','UNIT2','UNIT3'].forEach(unit=>{
-        const arr = summaryData.filter(x=>x.unit===unit);
-        if (arr.length){
-            const avgNormal = (arr.reduce((a,b)=>a + (b.normal/b.total)*100,0)/arr.length).toFixed(1);
-            const avgOut = (arr.reduce((a,b)=>a + (b.out/b.total)*100,0)/arr.length).toFixed(1);
-            const avgEmpty = (arr.reduce((a,b)=>a + (b.empty/b.total)*100,0)/arr.length).toFixed(1);
-            summarySheet.push(["", unit, `${avgNormal}%`, `${avgOut}%`, `${avgEmpty}%`, "Avg"]);
-        }
-    });
-    const wsSummary = XLSX.utils.aoa_to_sheet(summarySheet);
-    XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary Bulanan');
-
-    const fileName = `Logsheet_Chiller_${month}.xlsx`;
-    XLSX.writeFile(wb, fileName);
-    showNotification('✅ Logsheet bulanan berhasil diexport!', 'success');
+      const rows = arr.map(it => [
+        it.no, it.description, it.parameter, it.unit, it.range,
+        it.unit1["0930"], it.unit1["1200"], it.unit1["1500"], it.unit1["1800"], it.unit1["2100"],
+        it.unit2["0930"], it.unit2["1200"], it.unit2["1500"], it.unit2["1800"], it.unit2["2100"],
+        it.unit3["0930"], it.unit3["1200"], it.unit3["1500"], it.unit3["1800"], it.unit3["2100"]
+      ]);
+      const ws = XLSX.utils.aoa_to_sheet([...headers, ...rows]);
+      const sheetName = k.replace('logsheet_chiller_','');
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    } catch (e) { console.error(e); }
+  });
+  XLSX.writeFile(wb, `Logsheet_Chiller_${month}.xlsx`);
+  showNotification('✅ Export bulanan selesai!', 'success');
 }
 
 /* ===========================
-   Other utilities: copy previous day, backup, import, reports
-   - adapted to current helpers
+   Backup / Import functions
    =========================== */
-function copyFromPreviousDay() {
-    const currentDate = document.getElementById('dateSelect').value;
-    if (!currentDate) return;
-    const prev = new Date(currentDate);
-    prev.setDate(prev.getDate()-1);
-    const prevKey = `logsheet_chiller_${prev.toISOString().slice(0,10)}`;
-    const raw = localStorage.getItem(prevKey);
-    if (!raw) { showNotification(`Tidak ada data untuk ${prev.toISOString().slice(0,10)}`,'error'); return; }
-    try {
-        const parsed = JSON.parse(raw);
-        const data = parsed?.data || parsed || [];
-        data.forEach((item, i) => {
-            if (logsheetData[i] && (item.parameter === 'Setpoint Chiller' || item.parameter === 'Fan Cooling Tower')) {
-                logsheetData[i].unit1 = item.unit1;
-                logsheetData[i].unit2 = item.unit2;
-                logsheetData[i].unit3 = item.unit3;
-            }
-        });
-        populateLogsheetTable(); saveDataToStorage();
-        showNotification('Data dari hari sebelumnya berhasil disalin','success');
-    } catch(e) { showNotification('Error saat copy data','error'); }
-}
-
 function backupAllData() {
-    const all = {};
-    Object.keys(localStorage).filter(k=>k.startsWith('logsheet_chiller_')).forEach(k => all[k]=localStorage.getItem(k));
-    Object.keys(localStorage).filter(k=>k.startsWith('staff_data_')).forEach(k => all[k]=localStorage.getItem(k));
-    const blob = new Blob([JSON.stringify({version:'2.0', timestamp:new Date().toISOString(), data:all},null,2)], {type:'application/json'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = `Backup_Logsheet_${new Date().toISOString().slice(0,10)}.json`; a.click(); a.remove();
-    showNotification('Backup berhasil','success');
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('logsheet_chiller_'));
+  const staffKeys = Object.keys(localStorage).filter(k => k.startsWith('staff_data_'));
+  const data = {}, staff = {};
+  keys.forEach(k => data[k] = localStorage.getItem(k));
+  staffKeys.forEach(k => staff[k] = localStorage.getItem(k));
+  const backup = { version:'2.0', timestamp: new Date().toISOString(), data, staff };
+  const blob = new Blob([JSON.stringify(backup,null,2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Backup_Logsheet_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showNotification('Backup selesai!', 'success');
 }
-
 function importBackupData() {
-    const input = document.createElement('input'); input.type='file'; input.accept='.json';
-    input.onchange = e => {
-        const f = e.target.files[0]; if (!f) return;
-        const reader = new FileReader();
-        reader.onload = ev => {
-            try {
-                const backup = JSON.parse(ev.target.result);
-                if (backup.data) {
-                    Object.keys(backup.data).forEach(k => localStorage.setItem(k, backup.data[k]));
-                    showNotification('Import backup berhasil','success');
-                    // reload current date
-                    const d = document.getElementById('dateSelect').value;
-                    loadDataForDate(d); loadStaffData(d);
-                } else showNotification('File backup tidak valid','error');
-            } catch(e){ showNotification('Error membaca file','error'); }
-        };
-        reader.readAsText(f);
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        if (parsed.data) {
+          Object.keys(parsed.data).forEach(k => localStorage.setItem(k, parsed.data[k]));
+        }
+        if (parsed.staff) {
+          Object.keys(parsed.staff).forEach(k => localStorage.setItem(k, parsed.staff[k]));
+        }
+        const date = document.getElementById('dateSelect')?.value;
+        if (date) { loadDataForDate(date); loadStaffData(date); }
+        showNotification('Import berhasil!', 'success');
+      } catch (err) { showNotification('Format file backup tidak valid','error'); }
     };
-    input.click();
+    reader.readAsText(f);
+  };
+  input.click();
 }
 
 /* ===========================
-   Print, refresh, modal helpers, form handler
+   Generate daily report (text file)
    =========================== */
-function refreshData(event) {
-    const btn = event ? event.target : null;
-    if (btn) { btn.disabled = true; btn.innerHTML = '🔄 Refreshing...'; }
-    setTimeout(()=> {
-        updateDateTime();
-        populateLogsheetTable();
-        updateStatistics();
-        if (btn) { btn.disabled = false; btn.innerHTML = '🔄 Refresh'; }
-        showNotification('Data berhasil diperbarui!','success');
-    }, 600);
-}
-
-function printLogsheet(){ window.print(); }
-function inputData(){ document.getElementById('inputModal').classList.remove('hidden'); }
-function closeInputModal(){ document.getElementById('inputModal').classList.add('hidden'); document.getElementById('inputForm').reset(); }
-function closeQuickInputModal(){ document.getElementById('quickInputModal').classList.add('hidden'); }
-
-/* Input modal submit */
-const inputForm = document.getElementById('inputForm');
-if (inputForm) {
-    inputForm.addEventListener('submit', function(e){
-        e.preventDefault();
-        const paramNo = document.getElementById('parameterSelect').value;
-        const unit = document.getElementById('unitInput').value;
-        const time = document.getElementById('timeInput').value;
-        const raw = document.getElementById('valueInput').value;
-        const value = raw === '' ? '' : parseFloat(raw);
-        if (paramNo && unit && time && raw !== '') {
-            const item = logsheetData.find(i => i.no == paramNo);
-            if (item) {
-                item[unit][time] = value;
-                populateLogsheetTable(); updateStatistics(); saveDataToStorage(); closeInputModal();
-                showNotification('Data berhasil disimpan!', 'success');
-            }
-        } else showNotification('Mohon lengkapi semua field!', 'error');
-    });
+function generateDailyReport() {
+  const date = document.getElementById('dateSelect')?.value;
+  if (!date) { showNotification('Pilih tanggal dulu','error'); return; }
+  let total = 0, filled = 0, out = 0;
+  logsheetData.forEach(item => {
+    if (!item.parameter) return;
+    ['unit1','unit2','unit3'].forEach(u => ['0930','1200','1500','1800','2100'].forEach(t => {
+      total++;
+      const v = item[u][t];
+      if (v !== '') {
+        filled++;
+        if (!validateValue(v, item.range, item.unit)) out++;
+      }
+    }));
+  });
+  const report = [
+    `LAPORAN HARIAN LOGSHEET - ${new Date(date).toLocaleDateString('id-ID')}`,
+    `Total Parameter: ${total}`,
+    `Terisi: ${filled}`,
+    `Di luar range: ${out}`,
+    `` , `PETUGAS:`,
+    `Supervisor: ${staffData.supervisor || '-'}`,
+    `09:30: ${staffData['0930'] || '-'}`, `12:00: ${staffData['1200'] || '-'}`, `15: ${staffData['1500'] || '-'}`, `18: ${staffData['1800'] || '-'}`, `21: ${staffData['2100'] || '-'}`,
+  ].join('\n');
+  const blob = new Blob([report], { type:'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Laporan_Harian_${date}.txt`;
+  a.click();
+  showNotification('Laporan harian dibuat!', 'success');
 }
 
 /* ===========================
-   Init: when DOM loaded
-   - populate parameter select
-   - load selected date's data
+   Date display & initialization
    =========================== */
+function updateDateDisplay() {
+  const dateInput = document.getElementById('dateSelect');
+  if (!dateInput) return;
+  const d = new Date(dateInput.value);
+  if (!isNaN(d)) {
+    document.getElementById('currentDate').textContent = d.toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+  }
+  loadDataForDate(dateInput.value);
+  loadStaffData(dateInput.value);
+  loadLastSaveTime();
+  populateParameterSelect();
+}
+
+/* Initialize on DOM ready (single entrypoint) */
+function updateDateTime() {
+  const now = new Date();
+  const curDateEl = document.getElementById('currentDate');
+  if (curDateEl) curDateEl.textContent = now.toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+  const lastUpdate = document.getElementById('lastUpdate');
+  if (lastUpdate) lastUpdate.textContent = now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}) + ' WIB';
+}
 function initializeLogsheet() {
-    populateParameterSelect();
-    const dateInput = document.getElementById('dateSelect');
-    const selectedDate = dateInput && dateInput.value ? dateInput.value : (new Date().toISOString().slice(0,10));
-    // Ensure date picker shows selected
-    if (dateInput) dateInput.value = selectedDate;
-    loadStaffData(selectedDate);
-    loadDataForDate(selectedDate);
-    loadLastSaveTime();
-    updateDateTime();
-    updateStatistics();
+  populateParameterSelect();
+  loadLastSaveTime();
+  const dateVal = document.getElementById('dateSelect')?.value;
+  if (dateVal) { loadDataForDate(dateVal); loadStaffData(dateVal); }
+  populateLogsheetTable();
+  updateStatistics();
 }
-window.addEventListener('DOMContentLoaded', initializeLogsheet);
+window.addEventListener('DOMContentLoaded', () => {
+  initializeLogsheet();
+  // attach quick input listeners already above; safe to ensure selects exist:
+  document.getElementById('quickUnitSelect')?.addEventListener('change', populateQuickInputTable);
+  document.getElementById('quickTimeSelect')?.addEventListener('change', populateQuickInputTable);
+});
+
+/* Auto refresh & autosave */
+setInterval(updateDateTime, 300000); // 5 min
+setInterval(() => {
+  const last = localStorage.getItem('logsheet_last_save');
+  const now = new Date().toISOString();
+  if (!last || (new Date(now) - new Date(last)) > 30000) {
+    // only save if there is any non-empty value
+    const hasData = logsheetData.some(it =>
+      Object.values(it.unit1 || {}).some(v => v !== '') ||
+      Object.values(it.unit2 || {}).some(v => v !== '') ||
+      Object.values(it.unit3 || {}).some(v => v !== '')
+    );
+    if (hasData) saveDataToStorage();
+  }
+}, 30000);
 </script>
-
-        // Show notification
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-medium z-50 ${
-                type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            }`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // Quick Input Mode Functions
-        function quickInputMode() {
-            document.getElementById('quickInputModal').classList.remove('hidden');
-            populateQuickInputTable();
-        }
-
-        function closeQuickInputModal() {
-            document.getElementById('quickInputModal').classList.add('hidden');
-        }
-
-        function populateQuickInputTable() {
-            const tbody = document.getElementById('quickInputTableBody');
-            const selectedUnit = document.getElementById('quickUnitSelect').value;
-            const selectedTime = document.getElementById('quickTimeSelect').value;
-            
-            tbody.innerHTML = '';
-
-            logsheetData.forEach(item => {
-                if (item.parameter) {
-                    const row = document.createElement('tr');
-                    const currentValue = item[selectedUnit][selectedTime];
-                    const isValid = validateValue(currentValue, item.range, item.unit);
-                    
-                    const statusClass = currentValue === '' ? 'bg-gray-100' : 
-                                       isValid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-                    const statusText = currentValue === '' ? 'Belum diisi' : 
-                                      isValid ? '✅ Normal' : '⚠️ Di luar range';
-
-                    row.innerHTML = `
-                        <td class="border border-gray-300 p-2 text-center">${item.no}</td>
-                        <td class="border border-gray-300 p-2">${item.parameter}</td>
-                        <td class="border border-gray-300 p-2 text-center">${item.unit}</td>
-                        <td class="border border-gray-300 p-2 text-xs">${item.range}</td>
-                        <td class="border border-gray-300 p-2 text-center">
-                            <input type="number" step="0.1" 
-                                   value="${currentValue}" 
-                                   data-param="${item.no}"
-                                   data-unit="${selectedUnit}"
-                                   data-time="${selectedTime}"
-                                   class="w-full text-center border-0 bg-transparent focus:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
-                                   onkeydown="handleQuickInputKeydown(event)"
-                                   onblur="updateQuickInputValue(this)">
-                        </td>
-                        <td class="border border-gray-300 p-2 text-center">
-                            <span class="px-2 py-1 rounded text-xs ${statusClass}">${statusText}</span>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                }
-            });
-        }
-
-        function handleQuickInputKeydown(event) {
-            if (event.key === 'Enter') {
-                updateQuickInputValue(event.target);
-                event.target.blur();
-            } else if (event.key === 'Escape') {
-                event.target.blur();
-            }
-        }
-
-        function updateQuickInputValue(input) {
-            const paramNo = input.dataset.param;
-            const unit = input.dataset.unit;
-            const time = input.dataset.time;
-            const value = parseFloat(input.value) || '';
-            
-            const dataItem = logsheetData.find(item => item.no == paramNo);
-            if (dataItem) {
-                dataItem[unit][time] = value;
-                saveDataToStorage();
-                
-                // Update status
-                const row = input.closest('tr');
-                const statusCell = row.querySelector('td:last-child span');
-                const isValid = validateValue(value, dataItem.range, dataItem.unit);
-                
-                if (value === '') {
-                    statusCell.className = 'px-2 py-1 rounded text-xs bg-gray-100';
-                    statusCell.textContent = 'Belum diisi';
-                } else if (isValid) {
-                    statusCell.className = 'px-2 py-1 rounded text-xs bg-green-100 text-green-800';
-                    statusCell.textContent = '✅ Normal';
-                } else {
-                    statusCell.className = 'px-2 py-1 rounded text-xs bg-red-100 text-red-800';
-                    statusCell.textContent = '⚠️ Di luar range';
-                }
-            }
-        }
-
-        function saveAllQuickInput() {
-            populateLogsheetTable();
-            updateStatistics();
-            showNotification('Semua data berhasil disimpan!', 'success');
-        }
-
-        // Update quick input table when unit or time changes
-        document.getElementById('quickUnitSelect').addEventListener('change', populateQuickInputTable);
-        document.getElementById('quickTimeSelect').addEventListener('change', populateQuickInputTable);
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeLogsheet();
-            // Load data for current date
-            const currentDate = document.getElementById('dateSelect').value;
-            loadDataForDate(currentDate);
-            loadStaffData(currentDate);
-        });
-
-        // Auto-refresh every 5 minutes
-        setInterval(updateDateTime, 300000);
-        
-        // Auto-save every 30 seconds if there are changes
-        setInterval(() => {
-            const lastSave = localStorage.getItem('logsheet_last_save');
-            const now = new Date().toISOString();
-            if (!lastSave || (new Date(now) - new Date(lastSave)) > 30000) {
-                // Only save if there's actual data
-                const hasData = logsheetData.some(item => 
-                    Object.values(item.unit1).some(v => v !== '') ||
-                    Object.values(item.unit2).some(v => v !== '') ||
-                    Object.values(item.unit3).some(v => v !== '')
-                );
-                if (hasData) {
-                    saveDataToStorage();
-                }
-            }
-        }, 30000);
-    </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'974e69cb204cf46d',t:'MTc1NjE1OTc2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-</html>
-
-
-
-
