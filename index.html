@@ -635,970 +635,701 @@
               unit2: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
               unit3: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' } }
         ];
-        // ==================== POPULATE LOGSHEET TABLE ====================
-function populateLogsheetTable() {
-    const tbody = document.getElementById('logsheetTableBody');
-    tbody.innerHTML = ""; // Bersihkan isi tabel sebelumnya
 
-    logsheetData.forEach((item, index) => {
-        const row = document.createElement("tr");
-        row.className = "border-b hover:bg-gray-50";
+// ==================== GENERATE UNIT CELLS ====================
+function generateUnitCells(unitData, range, unit, unitKey, rowNo) {
+    const times = ['0930', '1200', '1500', '1800', '2100'];
+    return times.map(time => {
+        const value = unitData[time];
+        const displayValue = value !== '' ? value : '';
+        const cellClass = validateValue(value, range, unit)
+            ? 'in-range'
+            : (value !== '' ? 'out-of-range' : '');
+        return `
+            <td class="border border-gray-300 p-1 text-center value-cell ${cellClass}">
+                <input 
+                    type="number" 
+                    step="0.1"
+                    value="${displayValue ?? ''}"
+                    onchange="updateValue(${rowNo}, '${unitKey}', '${time}', this.value)"
+                    class="w-16 text-center border rounded px-1 py-0.5 text-xs"
+                >
+            </td>`;
+    }).join('');
+}
 
-        row.innerHTML = `
-            <td class="border px-2 py-1 text-center">${item.no}</td>
-            <td class="border px-2 py-1">${item.parameter}</td>
-            <td class="border px-2 py-1 text-center">${item.unit}</td>
-            <td class="border px-2 py-1 text-center">${item.range}</td>
+// ==================== VALIDASI RANGE ====================
+function validateValue(value, range, unit) {
+    if (value === '' || range === 'Actual') return true;
+    const num = parseFloat(value);
+    if (isNaN(num)) return true;
 
-            ${["0930", "1200", "1500", "1800", "2100"].map(time => `
-                <td class="border px-2 py-1 text-center">
-                    <input 
-                        type="number" 
-                        step="0.1" 
-                        value="${item.unit1[time] ?? ''}" 
-                        onchange="updateValue(${index}, 'unit1', '${time}', this.value)"
-                        class="w-16 text-center border rounded px-1 py-0.5 text-xs"
-                    >
-                </td>
-                <td class="border px-2 py-1 text-center">
-                    <input 
-                        type="number" 
-                        step="0.1" 
-                        value="${item.unit2[time] ?? ''}" 
-                        onchange="updateValue(${index}, 'unit2', '${time}', this.value)"
-                        class="w-16 text-center border rounded px-1 py-0.5 text-xs"
-                    >
-                </td>
-                <td class="border px-2 py-1 text-center">
-                    <input 
-                        type="number" 
-                        step="0.1" 
-                        value="${item.unit3[time] ?? ''}" 
-                        onchange="updateValue(${index}, 'unit3', '${time}', this.value)"
-                        class="w-16 text-center border rounded px-1 py-0.5 text-xs"
-                    >
-                </td>
-            `).join('')}
-        `;
-
-        tbody.appendChild(row);
+    if (range.includes('-')) {
+        const [min, max] = range.replace(/[°C|kPa|%]/g, '').split('-').map(parseFloat);
+        return num >= min && num <= max;
+    }
+    if (range.includes('<')) {
+        const max = parseFloat(range.replace(/[<°C|kPa|%]/g, ''));
+        return num < max;
+    }
+    if (range.includes('>')) {
+        const min = parseFloat(range.replace(/[>°C|kPa|%]/g, ''));
+        return num > min;
+    }
+    return true;
+}
+        
+// ==================== PARAMETER SELECT MODAL ====================
+function populateParameterSelect() {
+    const select = document.getElementById('parameterSelect');
+    if (!select) return;
+    select.innerHTML = '<option value="">Pilih Parameter</option>';
+    logsheetData.forEach(item => {
+        if (item.parameter) {
+            const opt = document.createElement('option');
+            opt.value = item.no;
+            opt.textContent = `${item.no}. ${item.parameter}`;
+            select.appendChild(opt);
+        }
     });
 }
 
-// ==================== UPDATE VALUE FUNCTION ====================
-function updateValue(index, unit, time, value) {
-    logsheetData[index][unit][time] = value;
-    saveDataToLocal();
-}
+// ==================== STAFF DATA ====================
+let staffData = {
+    '0930': '', '1200': '', '1500': '', '1800': '', '2100': '',
+    supervisor: '', manager: '',
+    signature0930: '', signature1200: '', signature1500: '', signature1800: '', signature2100: '',
+    supervisorSignature: '', managerSignature: ''
+};
 
-// Simpan data ke localStorage
-function saveDataToLocal() {
+function saveStaffData() {
     const date = document.getElementById('dateSelect').value;
-    localStorage.setItem(`logsheet_chiller_${date}`, JSON.stringify(logsheetData));
-    document.getElementById('lastSaveTime').textContent = new Date().toLocaleTimeString();
+    staffData = {
+        '0930': document.getElementById('staff0930').value,
+        '1200': document.getElementById('staff1200').value,
+        '1500': document.getElementById('staff1500').value,
+        '1800': document.getElementById('staff1800').value,
+        '2100': document.getElementById('staff2100').value,
+        supervisor: document.getElementById('supervisor').value,
+        manager: document.getElementById('manager').value,
+        signature0930: document.getElementById('signature0930').value,
+        signature1200: document.getElementById('signature1200').value,
+        signature1500: document.getElementById('signature1500').value,
+        signature1800: document.getElementById('signature1800').value,
+        signature2100: document.getElementById('signature2100').value,
+        supervisorSignature: document.getElementById('supervisorSignature').value,
+        managerSignature: document.getElementById('managerSignature').value
+    };
+    localStorage.setItem(`staff_data_${date}`, JSON.stringify(staffData));
 }
 
+function loadStaffData(date) {
+    const data = JSON.parse(localStorage.getItem(`staff_data_${date}`) || 'null');
+    if (data) {
+        Object.keys(data).forEach(k => {
+            const el = document.getElementById(k);
+            if (el) el.value = data[k];
+        });
+        staffData = data;
+    }
+}
 
-        // Staff data for signature tracking
-        let staffData = {
-            '0930': '',
-            '1200': '',
-            '1500': '',
-            '1800': '',
-            '2100': '',
-            supervisor: '',
-            manager: '',
-            signature0930: '',
-            signature1200: '',
-            signature1500: '',
-            signature1800: '',
-            signature2100: '',
-            supervisorSignature: '',
-            managerSignature: ''
-        };
+// ==================== TANGGAL DAN INISIALISASI ====================
+function updateDateTime() {
+    const now = new Date();
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'long', year: 'numeric'
+    });
+    document.getElementById('lastUpdate').textContent =
+        now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+}
 
-        // Initialize the logsheet
 function initializeLogsheet() {
     populateLogsheetTable();
     populateParameterSelect();
     updateDateTime();
     updateStatistics();
-    loadLastSaveTime();
+    loadStaffData(document.getElementById('dateSelect').value);
 }
 
-// ==================== TAMPILKAN DATA LOGSHEET DI TABEL ====================
+window.addEventListener('DOMContentLoaded', initializeLogsheet);
+</script>
+
+       <script>
+/* ===========================
+   Helper: Notification toast
+   =========================== */
+function showNotification(message, type = 'info', timeout = 2500) {
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.style.position = 'fixed';
+        container.style.right = '16px';
+        container.style.top = '16px';
+        container.style.zIndex = 9999;
+        document.body.appendChild(container);
+    }
+    const el = document.createElement('div');
+    el.textContent = message;
+    el.style.marginTop = '8px';
+    el.style.padding = '10px 14px';
+    el.style.borderRadius = '8px';
+    el.style.color = '#fff';
+    el.style.fontSize = '13px';
+    el.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
+    if (type === 'success') el.style.background = '#16a34a';
+    else if (type === 'error') el.style.background = '#dc2626';
+    else if (type === 'warning') el.style.background = '#d97706';
+    else el.style.background = '#0ea5e9';
+    container.appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; setTimeout(()=>el.remove(),400); }, timeout);
+}
+
+/* ===========================
+   populate / render table
+   - Uses tbody id="logsheetTableBody"
+   - Creates inputs that call updateValue(...)
+   =========================== */
 function populateLogsheetTable() {
-    const tbody = document.getElementById('logsheetBody');
-    if (!tbody) return; // aman kalau tabel belum dibuat
+    const tbody = document.getElementById('logsheetTableBody');
+    if (!tbody) return;
     tbody.innerHTML = '';
 
     logsheetData.forEach(item => {
         const tr = document.createElement('tr');
-        tr.className = "border-b hover:bg-gray-50";
-        tr.innerHTML = `
-            <td class="px-2 py-1 text-center">${item.no}</td>
-            <td class="px-2 py-1">${item.section || ''}</td>
-            <td class="px-2 py-1">${item.parameter}</td>
-            <td class="px-2 py-1 text-center">${item.unit}</td>
-            <td class="px-2 py-1 text-center">${item.range}</td>
+        // Section header styling if description equals section (you used this pattern)
+        const isSection = item.section && item.description === item.section;
+        if (isSection) tr.className = 'bg-gray-100 font-semibold';
 
-            <td class="value-cell">${item.unit1["0930"] ?? ''}</td>
-            <td class="value-cell">${item.unit1["1200"] ?? ''}</td>
-            <td class="value-cell">${item.unit1["1500"] ?? ''}</td>
-            <td class="value-cell">${item.unit1["1800"] ?? ''}</td>
-            <td class="value-cell">${item.unit1["2100"] ?? ''}</td>
+        // Build cells
+        const noTd = `<td class="border border-gray-300 p-2 text-center">${item.no}</td>`;
+        const descTd = `<td class="border border-gray-300 p-2 ${isSection ? 'font-bold' : ''}">${item.description || ''}</td>`;
+        const paramTd = `<td class="border border-gray-300 p-2">${item.parameter || ''}</td>`;
+        const unitTd = `<td class="border border-gray-300 p-2 text-center">${item.unit || ''}</td>`;
 
-            <td class="value-cell">${item.unit2["0930"] ?? ''}</td>
-            <td class="value-cell">${item.unit2["1200"] ?? ''}</td>
-            <td class="value-cell">${item.unit2["1500"] ?? ''}</td>
-            <td class="value-cell">${item.unit2["1800"] ?? ''}</td>
-            <td class="value-cell">${item.unit2["2100"] ?? ''}</td>
+        // unit cells (3 units x 5 times)
+        const times = ['0930','1200','1500','1800','2100'];
+        function unitCells(unitKey) {
+            return times.map(t => {
+                const value = item[unitKey]?.[t] ?? '';
+                const display = value !== '' ? value : '';
+                // input value uses item.no as identifier for updateValue
+                return `
+                    <td class="border border-gray-300 p-1 text-center value-cell">
+                        <input type="number" step="0.1" 
+                            value="${display}" 
+                            onchange="updateValue(${item.no}, '${unitKey}', '${t}', this.value)"
+                            class="w-16 text-center border rounded px-1 py-0.5 text-xs">
+                    </td>`;
+            }).join('');
+        }
 
-            <td class="value-cell">${item.unit3["0930"] ?? ''}</td>
-            <td class="value-cell">${item.unit3["1200"] ?? ''}</td>
-            <td class="value-cell">${item.unit3["1500"] ?? ''}</td>
-            <td class="value-cell">${item.unit3["1800"] ?? ''}</td>
-            <td class="value-cell">${item.unit3["2100"] ?? ''}</td>
-        `;
+        tr.innerHTML = noTd + descTd + paramTd + unitTd +
+                       unitCells('unit1') + unitCells('unit2') + unitCells('unit3') +
+                       `<td class="border border-gray-300 p-2 text-center text-xs"></td>`;
+
         tbody.appendChild(tr);
     });
 }
 
+/* ===========================
+   Update value & save
+   - rowNo matches item.no
+   - saves to storage (with metadata)
+   - updates statistics & UI
+   =========================== */
+function updateValue(rowNo, unitKey, time, value) {
+    const idx = logsheetData.findIndex(i => i.no === rowNo);
+    if (idx === -1) return;
+    // normalize empty
+    logsheetData[idx][unitKey][time] = (value === '' ? '' : (isNaN(value) ? value : parseFloat(value)));
+    saveDataToStorage(); // persist
+    updateStatistics();
+    // update cell coloring: done on next populate; but we can update immediate by re-populating row
+    // simpler: re-populate table (fast enough)
+    populateLogsheetTable();
+}
 
-        // Populate the main logsheet table
-        function populateLogsheetTable() {
-            const tbody = document.getElementById('logsheetTableBody');
-            tbody.innerHTML = '';
+/* ===========================
+   Save to localStorage (new format with metadata)
+   =========================== */
+function saveDataToStorage() {
+    const currentDate = document.getElementById('dateSelect').value;
+    const storageKey = `logsheet_chiller_${currentDate}`;
+    const saveTime = new Date().toISOString();
 
-            logsheetData.forEach(item => {
-                const row = document.createElement('tr');
-                
-                // Check if this is a section header
-                const isSection = item.section && item.description === item.section;
-                if (isSection) {
-                    row.className = 'section-header';
-                }
-
-                row.innerHTML = `
-                    <td class="border border-gray-300 p-2 text-center">${item.no}</td>
-                    <td class="border border-gray-300 p-2 ${isSection ? 'font-bold' : ''}">${item.description}</td>
-                    <td class="border border-gray-300 p-2">${item.parameter}</td>
-                    <td class="border border-gray-300 p-2 text-center">${item.unit}</td>
-                    ${generateUnitCells(item.unit1, item.range, item.unit)}
-                    ${generateUnitCells(item.unit2, item.range, item.unit)}
-                    ${generateUnitCells(item.unit3, item.range, item.unit)}
-                    <td class="border border-gray-300 p-2 text-center text-xs"></td>
-                `;
-                tbody.appendChild(row);
-            });
+    const dataToSave = {
+        version: '2.0',
+        timestamp: saveTime,
+        date: currentDate,
+        data: logsheetData,
+        metadata: {
+            lastModified: saveTime,
+            facility: 'Mall Living World Grand Wisata'
         }
+    };
 
-        // Generate unit cells with value validation
-        function generateUnitCells(unitData, range, unit) {
-            const times = ['0930', '1200', '1500', '1800', '2100'];
-            return times.map(time => {
-                const value = unitData[time];
-                const displayValue = value !== '' ? value : '';
-                const cellClass = validateValue(value, range, unit) ? 'in-range' : (value !== '' ? 'out-of-range' : '');
-                return `<td class="border border-gray-300 p-1 text-center value-cell ${cellClass}">${displayValue}</td>`;
-            }).join('');
-        }
+    localStorage.setItem(storageKey, JSON.stringify(dataToSave));
+    localStorage.setItem('logsheet_last_save', saveTime);
 
-        // Validate if value is within acceptable range
-        function validateValue(value, range, unit) {
-            if (value === '' || range === 'Actual') return true;
-            
-            // Simple range validation - can be expanded
-            if (range.includes('-')) {
-                const [min, max] = range.replace(/[°C|kPa|%]/g, '').split('-').map(Number);
-                return value >= min && value <= max;
-            }
-            if (range.includes('<')) {
-                const max = parseFloat(range.replace(/[<°C|kPa|%]/g, ''));
-                return value < max;
-            }
-            if (range.includes('>')) {
-                const min = parseFloat(range.replace(/[>°C|kPa|%]/g, ''));
-                return value > min;
-            }
-            return true;
-        }
+    const lastSaveEl = document.getElementById('lastSaveTime');
+    if (lastSaveEl) {
+        lastSaveEl.textContent = new Date(saveTime).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+    }
 
-        // Update statistics
-        function updateStatistics() {
-            let totalParams = 0;
-            let filledParams = 0;
-            let outOfRangeParams = 0;
-            let totalLoad = 0;
-            let loadCount = 0;
+    const saveStatus = document.getElementById('autoSaveStatus');
+    if (saveStatus) {
+        saveStatus.textContent = 'Tersimpan';
+        saveStatus.className = 'text-green-600 pulse-save';
+        setTimeout(()=> { saveStatus.className = 'text-green-600'; }, 2000);
+    }
+}
 
-            logsheetData.forEach(item => {
-                if (item.parameter) {
-                    ['unit1', 'unit2', 'unit3'].forEach(unit => {
-                        ['0930', '1200', '1500', '1800', '2100'].forEach(time => {
-                            totalParams++;
-                            const value = item[unit][time];
-                            if (value !== '') {
-                                filledParams++;
-                                if (!validateValue(value, item.range, item.unit)) {
-                                    outOfRangeParams++;
-                                }
-                                
-                                // Calculate average load
-                                if (item.parameter === 'Percent Load Current') {
-                                    totalLoad += parseFloat(value);
-                                    loadCount++;
-                                }
-                            }
-                        });
-                    });
+/* ===========================
+   Load data for date
+   - supports old format (raw array) and new { data: [...] }
+   =========================== */
+function loadDataForDate(date) {
+    if (!date) return;
+    const storageKey = `logsheet_chiller_${date}`;
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            const dataArray = parsed.data || parsed;
+            // update only unit fields (keep other properties)
+            dataArray.forEach((savedItem, i) => {
+                if (logsheetData[i]) {
+                    if (savedItem.unit1) logsheetData[i].unit1 = savedItem.unit1;
+                    if (savedItem.unit2) logsheetData[i].unit2 = savedItem.unit2;
+                    if (savedItem.unit3) logsheetData[i].unit3 = savedItem.unit3;
                 }
             });
-
-            const completionRate = ((filledParams / totalParams) * 100).toFixed(1);
-            const avgLoad = loadCount > 0 ? (totalLoad / loadCount).toFixed(1) : 0;
-
-            document.getElementById('completionRate').textContent = completionRate + '%';
-            document.getElementById('warningParams').textContent = outOfRangeParams;
-            document.getElementById('avgLoad').textContent = avgLoad + '%';
-            
-            // Update system status
-            const systemStatus = outOfRangeParams === 0 ? '🟢 Normal' : 
-                                outOfRangeParams <= 3 ? '🟡 Perhatian' : '🔴 Critical';
-            document.getElementById('systemStatus').textContent = systemStatus;
+            populateLogsheetTable();
+            updateStatistics();
+            showNotification(`Data untuk ${date} berhasil dimuat!`, 'success');
+        } catch (e) {
+            console.error(e);
+            showNotification('Error loading data for this date', 'error');
         }
+    } else {
+        resetToDefaultValues();
+        populateLogsheetTable();
+        updateStatistics();
+    }
+}
 
-        // Populate parameter select for input modal
-        function populateParameterSelect() {
-            const select = document.getElementById('parameterSelect');
-            logsheetData.forEach(item => {
-                if (item.parameter) {
-                    const option = document.createElement('option');
-                    option.value = item.no;
-                    option.textContent = `${item.no}. ${item.parameter}`;
-                    select.appendChild(option);
+/* ===========================
+   Reset units to default '' (except some params if needed)
+   =========================== */
+function resetToDefaultValues() {
+    logsheetData.forEach(item => {
+        ['unit1','unit2','unit3'].forEach(unit => {
+            ['0930','1200','1500','1800','2100'].forEach(time => {
+                if (item[unit] && item[unit][time] !== undefined) {
+                    // keep values for some parameters if you want; currently reset all except specific ones
+                    if (item.parameter === 'Setpoint Chiller' || item.parameter === 'Fan Cooling Tower') {
+                        // keep existing
+                    } else {
+                        item[unit][time] = '';
+                    }
                 }
             });
-        }
+        });
+    });
+}
 
-        // Update date and time display
-        function updateDateTime() {
-            const now = new Date();
-            document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', { 
-                day: 'numeric', 
-                month: 'long', 
-                year: 'numeric' 
-            });
-            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('id-ID', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            }) + ' WIB';
-        }
+/* ===========================
+   Load last save time
+   =========================== */
+function loadLastSaveTime() {
+    const last = localStorage.getItem('logsheet_last_save');
+    if (last) {
+        const el = document.getElementById('lastSaveTime');
+        if (el) el.textContent = new Date(last).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+    }
+}
 
-        // Update date display when date picker changes
-        function updateDateDisplay() {
-            const dateInput = document.getElementById('dateSelect');
-            const selectedDate = new Date(dateInput.value);
-            document.getElementById('currentDate').textContent = selectedDate.toLocaleDateString('id-ID', { 
-                day: 'numeric', 
-                month: 'long', 
-                year: 'numeric' 
-            });
-            loadDataForDate(dateInput.value);
-            loadStaffData(dateInput.value);
+/* ===========================
+   Parameter select population
+   =========================== */
+function populateParameterSelect() {
+    const sel = document.getElementById('parameterSelect');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Pilih Parameter</option>';
+    logsheetData.forEach(item => {
+        if (item.parameter) {
+            const opt = document.createElement('option');
+            opt.value = item.no;
+            opt.textContent = `${item.no}. ${item.parameter}`;
+            sel.appendChild(opt);
         }
+    });
+}
 
-        // Save staff data
-        function saveStaffData() {
-            const currentDate = document.getElementById('dateSelect').value;
-            staffData = {
-                '0930': document.getElementById('staff0930').value,
-                '1200': document.getElementById('staff1200').value,
-                '1500': document.getElementById('staff1500').value,
-                '1800': document.getElementById('staff1800').value,
-                '2100': document.getElementById('staff2100').value,
-                supervisor: document.getElementById('supervisor').value,
-                manager: document.getElementById('manager').value,
-                signature0930: document.getElementById('signature0930').value,
-                signature1200: document.getElementById('signature1200').value,
-                signature1500: document.getElementById('signature1500').value,
-                signature1800: document.getElementById('signature1800').value,
-                signature2100: document.getElementById('signature2100').value,
-                supervisorSignature: document.getElementById('supervisorSignature').value,
-                managerSignature: document.getElementById('managerSignature').value
-            };
-            
-            localStorage.setItem(`staff_data_${currentDate}`, JSON.stringify(staffData));
-            showNotification('Data petugas tersimpan!', 'success');
+/* ===========================
+   Validate value vs range (basic parsing)
+   =========================== */
+function validateValue(value, range, unit) {
+    if (value === '' || value === undefined || range === 'Actual') return true;
+    const num = parseFloat(value);
+    if (isNaN(num)) return true;
+    // handle ranges like "27-31°C" -> 27 and 31
+    if (range.includes('-')) {
+        const pair = range.replace(/[^\d\-\.\s]/g,'').split('-').map(s => parseFloat(s)).filter(n=>!isNaN(n));
+        if (pair.length === 2) {
+            return num >= pair[0] && num <= pair[1];
         }
+    }
+    if (range.includes('<')) {
+        const max = parseFloat(range.replace(/[^\d\.\-]/g,''));
+        if (!isNaN(max)) return num < max;
+    }
+    if (range.includes('>')) {
+        const min = parseFloat(range.replace(/[^\d\.\-]/g,''));
+        if (!isNaN(min)) return num > min;
+    }
+    return true;
+}
 
-        // Load staff data
-        function loadStaffData(date) {
-            const savedStaffData = localStorage.getItem(`staff_data_${date}`);
-            if (savedStaffData) {
-                const data = JSON.parse(savedStaffData);
-                document.getElementById('staff0930').value = data['0930'] || '';
-                document.getElementById('staff1200').value = data['1200'] || '';
-                document.getElementById('staff1500').value = data['1500'] || '';
-                document.getElementById('staff1800').value = data['1800'] || '';
-                document.getElementById('staff2100').value = data['2100'] || '';
-                document.getElementById('supervisor').value = data.supervisor || '';
-                document.getElementById('manager').value = data.manager || '';
-                document.getElementById('signature0930').value = data.signature0930 || '';
-                document.getElementById('signature1200').value = data.signature1200 || '';
-                document.getElementById('signature1500').value = data.signature1500 || '';
-                document.getElementById('signature1800').value = data.signature1800 || '';
-                document.getElementById('signature2100').value = data.signature2100 || '';
-                document.getElementById('supervisorSignature').value = data.supervisorSignature || '';
-                document.getElementById('managerSignature').value = data.managerSignature || '';
-                staffData = data;
-            } else {
-                // Clear all fields for new date
-                document.getElementById('staff0930').value = '';
-                document.getElementById('staff1200').value = '';
-                document.getElementById('staff1500').value = '';
-                document.getElementById('staff1800').value = '';
-                document.getElementById('staff2100').value = '';
-                document.getElementById('supervisor').value = '';
-                document.getElementById('manager').value = '';
-                document.getElementById('signature0930').value = '';
-                document.getElementById('signature1200').value = '';
-                document.getElementById('signature1500').value = '';
-                document.getElementById('signature1800').value = '';
-                document.getElementById('signature2100').value = '';
-                document.getElementById('supervisorSignature').value = '';
-                document.getElementById('managerSignature').value = '';
-                staffData = {
-                    '0930': '', '1200': '', '1500': '', '1800': '', '2100': '',
-                    supervisor: '', manager: '',
-                    signature0930: '', signature1200: '', signature1500: '', signature1800: '', signature2100: '',
-                    supervisorSignature: '', managerSignature: ''
-                };
-            }
-        }
-
-        // Save data to localStorage with enhanced metadata
-        function saveDataToStorage() {
-            const currentDate = document.getElementById('dateSelect').value;
-            const storageKey = `logsheet_chiller_${currentDate}`;
-            const saveTime = new Date().toISOString();
-            
-            const dataToSave = {
-                version: '2.0',
-                timestamp: saveTime,
-                date: currentDate,
-                data: logsheetData,
-                metadata: {
-                    lastModified: saveTime,
-                    facility: 'Mall Living World Grand Wisata'
+/* ===========================
+   Statistics panel updater
+   - updates elements: #completionRate, #warningParams, #avgLoad, #systemStatus
+   =========================== */
+function updateStatistics() {
+    let total = 0, filled = 0, out = 0, totalLoad = 0, loadCount = 0;
+    logsheetData.forEach(item => {
+        if (!item.parameter) return;
+        ['unit1','unit2','unit3'].forEach(u => {
+            ['0930','1200','1500','1800','2100'].forEach(t => {
+                total++;
+                const v = item[u][t];
+                if (v !== '' && v !== undefined) {
+                    filled++;
+                    if (!validateValue(v, item.range, item.unit)) out++;
+                    if (item.parameter === 'Percent Load Current') { totalLoad += parseFloat(v); loadCount++; }
                 }
-            };
-            
-            localStorage.setItem(storageKey, JSON.stringify(dataToSave));
-            localStorage.setItem('logsheet_last_save', saveTime);
-            
-            // Update UI
-            document.getElementById('lastSaveTime').textContent = new Date(saveTime).toLocaleTimeString('id-ID', {
-                hour: '2-digit',
-                minute: '2-digit'
             });
-            
-            // Visual feedback
-            const saveStatus = document.getElementById('autoSaveStatus');
-            saveStatus.textContent = 'Tersimpan';
-            saveStatus.className = 'text-green-600 pulse-save';
-            setTimeout(() => {
-                saveStatus.className = 'text-green-600';
-            }, 2000);
-        }
+        });
+    });
+    const completion = total ? ((filled/total)*100).toFixed(1) : '0.0';
+    const avgLoad = loadCount ? (totalLoad/loadCount).toFixed(1) : '0.0';
+    const statusText = out === 0 ? '🟢 Normal' : (out <= 3 ? '🟡 Perhatian' : '🔴 Critical');
 
-        // Load data from localStorage
-        function loadDataForDate(date) {
-            const storageKey = `logsheet_chiller_${date}`;
-            const savedData = localStorage.getItem(storageKey);
-            
-            if (savedData) {
-                try {
-                    const parsedData = JSON.parse(savedData);
-                    const dataArray = parsedData.data || parsedData; // Handle both old and new format
-                    
-                    // Update logsheetData with saved data
-                    dataArray.forEach((savedItem, index) => {
-                        if (logsheetData[index]) {
-                            logsheetData[index].unit1 = savedItem.unit1;
-                            logsheetData[index].unit2 = savedItem.unit2;
-                            logsheetData[index].unit3 = savedItem.unit3;
-                        }
-                    });
-                    
-                    populateLogsheetTable();
-                    updateStatistics();
-                    showNotification(`Data untuk ${date} berhasil dimuat!`, 'success');
-                } catch (error) {
-                    showNotification('Error loading data for this date', 'error');
-                }
-            } else {
-                // Reset to default empty values for new date
-                resetToDefaultValues();
-                populateLogsheetTable();
-                updateStatistics();
-            }
-        }
+    const elCompletion = document.getElementById('completionRate');
+    if (elCompletion) elCompletion.textContent = `${completion}%`;
+    const elWarn = document.getElementById('warningParams');
+    if (elWarn) elWarn.textContent = out;
+    const elAvg = document.getElementById('avgLoad');
+    if (elAvg) elAvg.textContent = `${avgLoad}%`;
+    const elStatus = document.getElementById('systemStatus');
+    if (elStatus) elStatus.textContent = statusText;
+}
 
-        // Reset to default values
-        function resetToDefaultValues() {
-            logsheetData.forEach(item => {
-                ['unit1', 'unit2', 'unit3'].forEach(unit => {
-                    ['0930', '1200', '1500', '1800', '2100'].forEach(time => {
-                        if (item[unit] && item[unit][time] !== undefined) {
-                            // Keep default values for setpoint and fan cooling tower
-                            if (item.parameter === 'Setpoint Chiller' || item.parameter === 'Fan Cooling Tower') {
-                                // Keep existing values
-                            } else {
-                                item[unit][time] = '';
-                            }
-                        }
-                    });
-                });
+/* ===========================
+   Staff data functions
+   =========================== */
+let staffData = {
+    '0930':'','1200':'','1500':'','1800':'','2100':'',
+    supervisor:'', manager:'',
+    signature0930:'', signature1200:'', signature1500:'', signature1800:'', signature2100:'',
+    supervisorSignature:'', managerSignature:''
+};
+
+function saveStaffData() {
+    const date = document.getElementById('dateSelect').value;
+    staffData = {
+        '0930': document.getElementById('staff0930') ? document.getElementById('staff0930').value : '',
+        '1200': document.getElementById('staff1200') ? document.getElementById('staff1200').value : '',
+        '1500': document.getElementById('staff1500') ? document.getElementById('staff1500').value : '',
+        '1800': document.getElementById('staff1800') ? document.getElementById('staff1800').value : '',
+        '2100': document.getElementById('staff2100') ? document.getElementById('staff2100').value : '',
+        supervisor: document.getElementById('supervisor') ? document.getElementById('supervisor').value : '',
+        manager: document.getElementById('manager') ? document.getElementById('manager').value : '',
+        signature0930: document.getElementById('signature0930') ? document.getElementById('signature0930').value : '',
+        signature1200: document.getElementById('signature1200') ? document.getElementById('signature1200').value : '',
+        signature1500: document.getElementById('signature1500') ? document.getElementById('signature1500').value : '',
+        signature1800: document.getElementById('signature1800') ? document.getElementById('signature1800').value : '',
+        signature2100: document.getElementById('signature2100') ? document.getElementById('signature2100').value : '',
+        supervisorSignature: document.getElementById('supervisorSignature') ? document.getElementById('supervisorSignature').value : '',
+        managerSignature: document.getElementById('managerSignature') ? document.getElementById('managerSignature').value : ''
+    };
+    localStorage.setItem(`staff_data_${date}`, JSON.stringify(staffData));
+    showNotification('Data petugas tersimpan!', 'success');
+}
+
+function loadStaffData(date) {
+    if (!date) return;
+    const raw = localStorage.getItem(`staff_data_${date}`);
+    if (raw) {
+        try {
+            const data = JSON.parse(raw);
+            Object.keys(data).forEach(k => {
+                const el = document.getElementById(k);
+                if (el) el.value = data[k];
             });
-        }
+            staffData = data;
+        } catch(e) { console.error(e); }
+    } else {
+        // clear fields
+        ['staff0930','staff1200','staff1500','staff1800','staff2100',
+         'supervisor','manager',
+         'signature0930','signature1200','signature1500','signature1800','signature2100',
+         'supervisorSignature','managerSignature'].forEach(id => {
+             const el = document.getElementById(id);
+             if (el) el.value = '';
+         });
+        staffData = { '0930':'','1200':'','1500':'','1800':'','2100':'', supervisor:'', manager:'', signature0930:'', signature1200:'', signature1500:'', signature1800:'', signature2100:'', supervisorSignature:'', managerSignature:'' };
+    }
+}
 
-        // Load last save time
-        function loadLastSaveTime() {
-            const lastSave = localStorage.getItem('logsheet_last_save');
-            if (lastSave) {
-                document.getElementById('lastSaveTime').textContent = new Date(lastSave).toLocaleTimeString('id-ID', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            }
-        }
-
-        // Advanced Export to Excel with proper formatting
-        // ==================== EXPORT LOGSHEET TO EXCEL (ENHANCED VERSION) ====================
+/* ===========================
+   Export functions (ke XLSX)
+   - exportLogsheet() and exportMonthlyLogsheet()
+   - Reused your existing logic, integrated with current data structure
+   =========================== */
 function exportLogsheet() {
-    // Header kolom utama
-    const headers = [
-        ["No", "Description", "Parameter", "Unit", "Range",
-         "Unit1_09:30", "Unit1_12:00", "Unit1_15:00", "Unit1_18:00", "Unit1_21:00",
-         "Unit2_09:30", "Unit2_12:00", "Unit2_15:00", "Unit2_18:00", "Unit2_21:00",
-         "Unit3_09:30", "Unit3_12:00", "Unit3_15:00", "Unit3_18:00", "Unit3_21:00"]
-    ];
-
-    // Data baris dari logsheetData
+    // header
+    const headers = [["No","Description","Parameter","Unit","Range",
+        "Unit1_09:30","Unit1_12:00","Unit1_15:00","Unit1_18:00","Unit1_21:00",
+        "Unit2_09:30","Unit2_12:00","Unit2_15:00","Unit2_18:00","Unit2_21:00",
+        "Unit3_09:30","Unit3_12:00","Unit3_15:00","Unit3_18:00","Unit3_21:00"]];
     const rows = logsheetData.map(item => [
-        item.no, item.description, item.parameter, item.unit, item.range,
+        item.no, item.description || '', item.parameter || '', item.unit || '', item.range || '',
         item.unit1["0930"], item.unit1["1200"], item.unit1["1500"], item.unit1["1800"], item.unit1["2100"],
         item.unit2["0930"], item.unit2["1200"], item.unit2["1500"], item.unit2["1800"], item.unit2["2100"],
         item.unit3["0930"], item.unit3["1200"], item.unit3["1500"], item.unit3["1800"], item.unit3["2100"]
     ]);
-
     const ws = XLSX.utils.aoa_to_sheet([...headers, ...rows]);
 
-    // === Styling dasar (header bold) ===
+    // auto widths
     const range = XLSX.utils.decode_range(ws['!ref']);
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-        const col = XLSX.utils.encode_col(C);
-        const cell = ws[col + "1"];
-        if (cell) {
-            cell.s = {
-                font: { bold: true },
-                alignment: { horizontal: "center", vertical: "center" },
-                fill: { fgColor: { rgb: "E5E7EB" } }
-            };
-        }
-    }
-
-    // === Pewarnaan otomatis berdasarkan range ===
-    for (let R = 1; R <= range.e.r; ++R) {
-        const item = logsheetData[R - 1];
-        if (!item) continue;
-
-        const allUnits = ["unit1", "unit2", "unit3"];
-        const times = ["0930", "1200", "1500", "1800", "2100"];
-        let colIndex = 5; // mulai dari kolom ke-6 (0-based index)
-
-        allUnits.forEach(unit => {
-            times.forEach(time => {
-                const val = item[unit][time];
-                const cell = ws[XLSX.utils.encode_cell({ r: R + 1, c: colIndex })]; // +1 karena header
-                if (cell) {
-                    let bgColor = "D1FAE5"; // default hijau muda
-                    if (val === "" || val === undefined) bgColor = "E5E7EB"; // abu untuk kosong
-                    else if (!validateValue(val, item.range, item.unit)) bgColor = "FEE2E2"; // merah jika out of range
-
-                    cell.s = {
-                        alignment: { horizontal: "center", vertical: "center" },
-                        fill: { fgColor: { rgb: bgColor } }
-                    };
-                }
-                colIndex++;
-            });
-        });
-    }
-
-    // === Auto width kolom ===
     const colWidths = [];
     for (let C = range.s.c; C <= range.e.c; ++C) {
-        let maxLen = 10;
+        let maxLen = 8;
         for (let R = range.s.r; R <= range.e.r; ++R) {
-            const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
+            const cell = ws[XLSX.utils.encode_cell({r:R,c:C})];
             if (cell && cell.v) {
-                const len = cell.v.toString().length;
+                const len = String(cell.v).length;
                 if (len > maxLen) maxLen = len;
             }
         }
-        colWidths.push({ wch: maxLen + 2 });
+        colWidths.push({wch: maxLen + 2});
     }
-    ws["!cols"] = colWidths;
+    ws['!cols'] = colWidths;
 
-    // === Sheet 2: Summary ===
-    const summary = [
-        ["Unit", "Normal (%)", "Out of Range (%)", "Kosong (%)", "Total Parameter"]
-    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Data Logsheet');
 
-    const times = ["0930", "1200", "1500", "1800", "2100"];
-    const units = ["unit1", "unit2", "unit3"];
-
-    units.forEach(unit => {
-        let normal = 0, out = 0, empty = 0, total = 0;
-        logsheetData.forEach(item => {
-            times.forEach(t => {
-                const val = item[unit][t];
-                if (val === "" || val === undefined) empty++;
-                else if (validateValue(val, item.range, item.unit)) normal++;
+    // Summary sheet
+    const summary = [["Unit","Normal (%)","Out of Range (%)","Kosong (%)","Total Parameter"]];
+    const timesArr = ["0930","1200","1500","1800","2100"];
+    ['unit1','unit2','unit3'].forEach(unit => {
+        let normal=0,out=0,empty=0,total=0;
+        logsheetData.forEach(item=>{
+            timesArr.forEach(t=>{
+                const v = item[unit][t];
+                if (v === '' || v === undefined) empty++;
+                else if (validateValue(v, item.range, item.unit)) normal++;
                 else out++;
                 total++;
             });
         });
-        const normPct = ((normal / total) * 100).toFixed(1) + "%";
-        const outPct = ((out / total) * 100).toFixed(1) + "%";
-        const empPct = ((empty / total) * 100).toFixed(1) + "%";
-        summary.push([unit.toUpperCase(), normPct, outPct, empPct, total]);
+        summary.push([unit.toUpperCase(), ((normal/total)*100).toFixed(1)+'%', ((out/total)*100).toFixed(1)+'%', ((empty/total)*100).toFixed(1)+'%', total]);
     });
+    const wsS = XLSX.utils.aoa_to_sheet(summary);
+    XLSX.utils.book_append_sheet(wb, wsS, 'Summary');
 
-    const wsSummary = XLSX.utils.aoa_to_sheet(summary);
-
-    // Styling summary header
-    const sRange = XLSX.utils.decode_range(wsSummary['!ref']);
-    for (let C = sRange.s.c; C <= sRange.e.c; ++C) {
-        const col = XLSX.utils.encode_col(C);
-        const cell = wsSummary[col + "1"];
-        if (cell) {
-            cell.s = {
-                font: { bold: true },
-                fill: { fgColor: { rgb: "DBEAFE" } },
-                alignment: { horizontal: "center", vertical: "center" }
-            };
-        }
-    }
-
-    // Center semua data di summary
-    for (let R = 1; R <= sRange.e.r; ++R) {
-        for (let C = sRange.s.c; C <= sRange.e.c; ++C) {
-            const cell = wsSummary[XLSX.utils.encode_cell({ r: R + 1, c: C })];
-            if (cell) cell.s = { alignment: { horizontal: "center", vertical: "center" } };
-        }
-    }
-
-    // Auto width summary
-    wsSummary["!cols"] = [{ wch: 15 }, { wch: 15 }, { wch: 18 }, { wch: 15 }, { wch: 18 }];
-
-    // === Buat workbook dan export ===
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Data Logsheet");
-    XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
-
-    const date = new Date().toISOString().slice(0, 10);
+    const date = document.getElementById('dateSelect').value || (new Date().toISOString().slice(0,10));
     XLSX.writeFile(wb, `Logsheet_Chiller_${date}.xlsx`);
-
-    showNotification("✅ Logsheet & Summary berhasil diexport ke Excel!", "success");
+    showNotification('✅ Logsheet berhasil diexport!', 'success');
 }
-        // ==================== EXPORT BULANAN KE EXCEL (DENGAN SUMMARY RATA-RATA) ====================
+
 function exportMonthlyLogsheet() {
-    const month = new Date(document.getElementById('dateSelect').value).toISOString().slice(0, 7); // contoh: 2025-11
+    const month = new Date(document.getElementById('dateSelect').value).toISOString().slice(0,7);
     const keys = Object.keys(localStorage).filter(k => k.startsWith(`logsheet_chiller_${month}`));
-
-    if (keys.length === 0) {
-        showNotification(`❌ Tidak ada data logsheet untuk bulan ${month}`, 'error');
-        return;
-    }
-
+    if (keys.length === 0) { showNotification(`❌ Tidak ada data untuk bulan ${month}`, 'error'); return; }
     const wb = XLSX.utils.book_new();
     let summaryData = [];
-
-    keys.sort(); // urutkan tanggal
-
+    keys.sort();
     keys.forEach(key => {
-        const date = key.replace('logsheet_chiller_', '');
-        const data = JSON.parse(localStorage.getItem(key));
-        const headers = [
-            ["No", "Description", "Parameter", "Unit", "Range",
-             "Unit1_09:30", "Unit1_12:00", "Unit1_15:00", "Unit1_18:00", "Unit1_21:00",
-             "Unit2_09:30", "Unit2_12:00", "Unit2_15:00", "Unit2_18:00", "Unit2_21:00",
-             "Unit3_09:30", "Unit3_12:00", "Unit3_15:00", "Unit3_18:00", "Unit3_21:00"]
-        ];
-
+        const date = key.replace('logsheet_chiller_','');
+        const raw = localStorage.getItem(key);
+        if (!raw) return;
+        let parsed; try { parsed = JSON.parse(raw); } catch(e){ parsed = null; }
+        const data = parsed?.data || parsed || [];
+        const headers = [["No","Description","Parameter","Unit","Range",
+            "Unit1_09:30","Unit1_12:00","Unit1_15:00","Unit1_18:00","Unit1_21:00",
+            "Unit2_09:30","Unit2_12:00","Unit2_15:00","Unit2_18:00","Unit2_21:00",
+            "Unit3_09:30","Unit3_12:00","Unit3_15:00","Unit3_18:00","Unit3_21:00"]];
         const rows = data.map(item => [
-            item.no, item.description, item.parameter, item.unit, item.range,
+            item.no, item.description || '', item.parameter || '', item.unit || '', item.range || '',
             item.unit1["0930"], item.unit1["1200"], item.unit1["1500"], item.unit1["1800"], item.unit1["2100"],
             item.unit2["0930"], item.unit2["1200"], item.unit2["1500"], item.unit2["1800"], item.unit2["2100"],
             item.unit3["0930"], item.unit3["1200"], item.unit3["1500"], item.unit3["1800"], item.unit3["2100"]
         ]);
-
         const ws = XLSX.utils.aoa_to_sheet([...headers, ...rows]);
-        XLSX.utils.book_append_sheet(wb, ws, date);
-
-        // Buat ringkasan per tanggal per unit
-        const units = ["unit1", "unit2", "unit3"];
-        const times = ["0930", "1200", "1500", "1800", "2100"];
-
-        units.forEach(unit => {
-            let normal = 0, out = 0, empty = 0, total = 0;
-            data.forEach(item => {
-                times.forEach(t => {
-                    const val = item[unit][t];
-                    if (val === "" || val === undefined) empty++;
-                    else if (validateValue(val, item.range, item.unit)) normal++;
+        XLSX.utils.book_append_sheet(wb, ws, date.slice(5)); // sheet name use MM-DD or date (avoid too long)
+        // summary per date
+        ['unit1','unit2','unit3'].forEach(unit=>{
+            let normal=0,out=0,empty=0,total=0;
+            data.forEach(item=>{
+                ['0930','1200','1500','1800','2100'].forEach(t=>{
+                    const v = item[unit][t];
+                    if (v === '' || v === undefined) empty++;
+                    else if (validateValue(v, item.range, item.unit)) normal++;
                     else out++;
                     total++;
                 });
             });
-            summaryData.push({
-                tanggal: date,
-                unit: unit.toUpperCase(),
-                normal: normal,
-                out: out,
-                empty: empty,
-                total: total
-            });
+            summaryData.push({tanggal:date, unit:unit.toUpperCase(), normal, out, empty, total});
         });
     });
 
-    // Buat sheet summary bulanan
-    const summarySheet = [
-        ["Tanggal", "Unit", "Normal (%)", "Out of Range (%)", "Kosong (%)", "Total Parameter"]
-    ];
-
-    // Data per hari
+    const summarySheet = [["Tanggal","Unit","Normal (%)","Out of Range (%)","Kosong (%)","Total Parameter"]];
     summaryData.forEach(s => {
-        const normalPct = ((s.normal / s.total) * 100).toFixed(1);
-        const outPct = ((s.out / s.total) * 100).toFixed(1);
-        const empPct = ((s.empty / s.total) * 100).toFixed(1);
-        summarySheet.push([s.tanggal, s.unit, `${normalPct}%`, `${outPct}%`, `${empPct}%`, s.total]);
+        summarySheet.push([s.tanggal, s.unit, ((s.normal/s.total)*100).toFixed(1)+'%', ((s.out/s.total)*100).toFixed(1)+'%', ((s.empty/s.total)*100).toFixed(1)+'%', s.total]);
     });
-
-    // Hitung rata-rata per unit
-    const units = ["UNIT1", "UNIT2", "UNIT3"];
-    summarySheet.push([]); // baris kosong
-    summarySheet.push(["📊 RATA-RATA BULANAN", "", "", "", "", ""]);
-
-    units.forEach(unit => {
-        const dataPerUnit = summaryData.filter(s => s.unit === unit);
-        const totalHari = dataPerUnit.length;
-        if (totalHari > 0) {
-            const avgNormal = (dataPerUnit.reduce((a, b) => a + (b.normal / b.total) * 100, 0) / totalHari).toFixed(1);
-            const avgOut = (dataPerUnit.reduce((a, b) => a + (b.out / b.total) * 100, 0) / totalHari).toFixed(1);
-            const avgEmpty = (dataPerUnit.reduce((a, b) => a + (b.empty / b.total) * 100, 0) / totalHari).toFixed(1);
+    // averages
+    summarySheet.push([]);
+    summarySheet.push(["📊 RATA-RATA BULANAN", "","","","",""]);
+    ['UNIT1','UNIT2','UNIT3'].forEach(unit=>{
+        const arr = summaryData.filter(x=>x.unit===unit);
+        if (arr.length){
+            const avgNormal = (arr.reduce((a,b)=>a + (b.normal/b.total)*100,0)/arr.length).toFixed(1);
+            const avgOut = (arr.reduce((a,b)=>a + (b.out/b.total)*100,0)/arr.length).toFixed(1);
+            const avgEmpty = (arr.reduce((a,b)=>a + (b.empty/b.total)*100,0)/arr.length).toFixed(1);
             summarySheet.push(["", unit, `${avgNormal}%`, `${avgOut}%`, `${avgEmpty}%`, "Avg"]);
         }
     });
-
-    // Tambahkan ke workbook
     const wsSummary = XLSX.utils.aoa_to_sheet(summarySheet);
-
-    // Format kolom
-    wsSummary["!cols"] = [{ wch: 15 }, { wch: 10 }, { wch: 15 }, { wch: 18 }, { wch: 15 }, { wch: 18 }];
-
-    XLSX.utils.book_append_sheet(wb, wsSummary, "Summary Bulanan");
+    XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary Bulanan');
 
     const fileName = `Logsheet_Chiller_${month}.xlsx`;
     XLSX.writeFile(wb, fileName);
-
-    showNotification(`✅ Logsheet bulanan (${month}) berhasil diexport ke Excel dengan rekap rata-rata!`, "success");
+    showNotification('✅ Logsheet bulanan berhasil diexport!', 'success');
 }
 
-
-            // Add signature section with staff names and signatures
-            csvContent += `\n\nTanda Tangan:\n`;
-            csvContent += `Dibuat Oleh,Pic 09:30,Pic 12:00,Pic 15:00,Pic 18:00,Pic 21:00,Mengetahui\n`;
-            csvContent += `"${staffData.supervisor}","${staffData['0930']}","${staffData['1200']}","${staffData['1500']}","${staffData['1800']}","${staffData['2100']}","${staffData.manager}"\n`;
-            csvContent += `"${staffData.supervisorSignature}","${staffData.signature0930}","${staffData.signature1200}","${staffData.signature1500}","${staffData.signature1800}","${staffData.signature2100}","${staffData.managerSignature}"\n`;
-            csvContent += `Spv. Engineering,,,,,, Manager Engineering\n`;
-            
-            // Download file
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `Logsheet_Chiller_${currentDate}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showNotification('Data berhasil diexport ke Excel!', 'success');
-        }
-
-        // Backup all data with metadata
-        function backupAllData() {
-            const allData = {};
-            const allStaffData = {};
-            const keys = Object.keys(localStorage).filter(key => key.startsWith('logsheet_chiller_'));
-            const staffKeys = Object.keys(localStorage).filter(key => key.startsWith('staff_data_'));
-            
-            keys.forEach(key => {
-                allData[key] = localStorage.getItem(key);
-            });
-            
-            staffKeys.forEach(key => {
-                allStaffData[key] = localStorage.getItem(key);
-            });
-            
-            const backupData = {
-                version: '2.0',
-                timestamp: new Date().toISOString(),
-                totalDays: keys.length,
-                data: allData,
-                staffData: allStaffData,
-                metadata: {
-                    facility: 'Mall Living World Grand Wisata',
-                    system: 'Chiller Plan Logsheet',
-                    exportedBy: 'System Auto-Backup'
-                }
-            };
-            
-            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `Backup_Logsheet_Chiller_${new Date().toISOString().slice(0, 10)}.json`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showNotification(`Backup berhasil! ${keys.length} hari data tersimpan.`, 'success');
-        }
-
-        // Import backup data
-        function importBackupData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            const backupData = JSON.parse(e.target.result);
-                            
-                            if (backupData.data) {
-                                // Restore all data
-                                Object.keys(backupData.data).forEach(key => {
-                                    localStorage.setItem(key, backupData.data[key]);
-                                });
-                                
-                                // Restore staff data if available
-                                if (backupData.staffData) {
-                                    Object.keys(backupData.staffData).forEach(key => {
-                                        localStorage.setItem(key, backupData.staffData[key]);
-                                    });
-                                }
-                                
-                                // Reload current date data
-                                const currentDate = document.getElementById('dateSelect').value;
-                                loadDataForDate(currentDate);
-                                loadStaffData(currentDate);
-                                
-                                showNotification(`Import berhasil! ${Object.keys(backupData.data).length} hari data dipulihkan.`, 'success');
-                            } else {
-                                showNotification('Format file backup tidak valid!', 'error');
-                            }
-                        } catch (error) {
-                            showNotification('Error membaca file backup!', 'error');
-                        }
-                    };
-                    reader.readAsText(file);
-                }
-            };
-            input.click();
-        }
-
-        // Copy data from previous day
-        function copyFromPreviousDay() {
-            const currentDate = new Date(document.getElementById('dateSelect').value);
-            const previousDate = new Date(currentDate);
-            previousDate.setDate(previousDate.getDate() - 1);
-            const prevDateStr = previousDate.toISOString().slice(0, 10);
-            
-            const prevStorageKey = `logsheet_chiller_${prevDateStr}`;
-            const prevData = localStorage.getItem(prevStorageKey);
-            
-            if (prevData) {
-                try {
-                    const parsedData = JSON.parse(prevData);
-                    const dataArray = parsedData.data || parsedData;
-                    
-                    // Copy only specific parameters (like setpoints)
-                    dataArray.forEach((savedItem, index) => {
-                        if (logsheetData[index] && (
-                            savedItem.parameter === 'Setpoint Chiller' || 
-                            savedItem.parameter === 'Fan Cooling Tower'
-                        )) {
-                            logsheetData[index].unit1 = savedItem.unit1;
-                            logsheetData[index].unit2 = savedItem.unit2;
-                            logsheetData[index].unit3 = savedItem.unit3;
-                        }
-                    });
-                    
-                    populateLogsheetTable();
-                    saveDataToStorage();
-                    showNotification(`Data template dari ${prevDateStr} berhasil disalin!`, 'success');
-                } catch (error) {
-                    showNotification('Error copying previous day data', 'error');
-                }
-            } else {
-                showNotification(`Tidak ada data untuk tanggal ${prevDateStr}`, 'error');
-            }
-        }
-
-        // Generate daily report
-        function generateDailyReport() {
-            const currentDate = document.getElementById('dateSelect').value;
-            const formattedDate = new Date(currentDate).toLocaleDateString('id-ID');
-            
-            // Calculate statistics
-            let totalParams = 0;
-            let filledParams = 0;
-            let outOfRangeParams = 0;
-            
-            logsheetData.forEach(item => {
-                if (item.parameter) {
-                    ['unit1', 'unit2', 'unit3'].forEach(unit => {
-                        ['0930', '1200', '1500', '1800', '2100'].forEach(time => {
-                            totalParams++;
-                            const value = item[unit][time];
-                            if (value !== '') {
-                                filledParams++;
-                                if (!validateValue(value, item.range, item.unit)) {
-                                    outOfRangeParams++;
-                                }
-                            }
-                        });
-                    });
-                }
-            });
-            
-            const completionRate = ((filledParams / totalParams) * 100).toFixed(1);
-            const errorRate = filledParams > 0 ? ((outOfRangeParams / filledParams) * 100).toFixed(1) : 0;
-            
-            // Generate report content
-            let reportContent = `LAPORAN HARIAN LOGSHEET CHILLER\n`;
-            reportContent += `Mall Living World Grand Wisata\n`;
-            reportContent += `Tanggal: ${formattedDate}\n\n`;
-            reportContent += `PETUGAS:\n`;
-            reportContent += `- Supervisor: ${staffData.supervisor || '-'}\n`;
-            reportContent += `- Petugas 09:30: ${staffData['0930'] || '-'}\n`;
-            reportContent += `- Petugas 12:00: ${staffData['1200'] || '-'}\n`;
-            reportContent += `- Petugas 15:00: ${staffData['1500'] || '-'}\n`;
-            reportContent += `- Petugas 18:00: ${staffData['1800'] || '-'}\n`;
-            reportContent += `- Petugas 21:00: ${staffData['2100'] || '-'}\n`;
-            reportContent += `- Manager: ${staffData.manager || '-'}\n\n`;
-            reportContent += `RINGKASAN:\n`;
-            reportContent += `- Total Parameter: ${totalParams}\n`;
-            reportContent += `- Data Terisi: ${filledParams} (${completionRate}%)\n`;
-            reportContent += `- Data Normal: ${filledParams - outOfRangeParams}\n`;
-            reportContent += `- Data Abnormal: ${outOfRangeParams} (${errorRate}%)\n\n`;
-            
-            // Add abnormal readings
-            if (outOfRangeParams > 0) {
-                reportContent += `PARAMETER ABNORMAL:\n`;
-                logsheetData.forEach(item => {
-                    if (item.parameter) {
-                        ['unit1', 'unit2', 'unit3'].forEach(unit => {
-                            ['0930', '1200', '1500', '1800', '2100'].forEach(time => {
-                                const value = item[unit][time];
-                                if (value !== '' && !validateValue(value, item.range, item.unit)) {
-                                    reportContent += `- ${item.parameter} (${unit.toUpperCase()}, ${time}): ${value} ${item.unit} [Range: ${item.range}]\n`;
-                                }
-                            });
-                        });
-                    }
-                });
-            }
-            
-            // Download report
-            const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `Laporan_Harian_${currentDate}.txt`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showNotification('Laporan harian berhasil dibuat!', 'success');
-        }
-
-        // Refresh data function
-        function refreshData() {
-            const btn = event.target;
-            btn.innerHTML = '🔄 Refreshing...';
-            btn.disabled = true;
-            
-            setTimeout(() => {
-                updateDateTime();
-                populateLogsheetTable();
-                updateStatistics();
-                btn.innerHTML = '🔄 Refresh';
-                btn.disabled = false;
-                showNotification('Data berhasil diperbarui!', 'success');
-            }, 1500);
-        }
-
-        // Print logsheet
-        function printLogsheet() {
-            window.print();
-        }
-
-        // Open input data modal
-        function inputData() {
-            document.getElementById('inputModal').classList.remove('hidden');
-        }
-
-        // Close input data modal
-        function closeInputModal() {
-            document.getElementById('inputModal').classList.add('hidden');
-            document.getElementById('inputForm').reset();
-        }
-
-        // Handle input form submission
-        document.getElementById('inputForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const paramNo = document.getElementById('parameterSelect').value;
-            const unit = document.getElementById('unitInput').value;
-            const time = document.getElementById('timeInput').value;
-            const value = parseFloat(document.getElementById('valueInput').value);
-            
-            if (paramNo && unit && time && !isNaN(value)) {
-                // Find and update the data
-                const dataItem = logsheetData.find(item => item.no == paramNo);
-                if (dataItem) {
-                    dataItem[unit][time] = value;
-                    populateLogsheetTable();
-                    updateStatistics();
-                    saveDataToStorage();
-                    closeInputModal();
-                    showNotification('Data berhasil disimpan!', 'success');
-                }
-            } else {
-                showNotification('Mohon lengkapi semua field!', 'error');
+/* ===========================
+   Other utilities: copy previous day, backup, import, reports
+   - adapted to current helpers
+   =========================== */
+function copyFromPreviousDay() {
+    const currentDate = document.getElementById('dateSelect').value;
+    if (!currentDate) return;
+    const prev = new Date(currentDate);
+    prev.setDate(prev.getDate()-1);
+    const prevKey = `logsheet_chiller_${prev.toISOString().slice(0,10)}`;
+    const raw = localStorage.getItem(prevKey);
+    if (!raw) { showNotification(`Tidak ada data untuk ${prev.toISOString().slice(0,10)}`,'error'); return; }
+    try {
+        const parsed = JSON.parse(raw);
+        const data = parsed?.data || parsed || [];
+        data.forEach((item, i) => {
+            if (logsheetData[i] && (item.parameter === 'Setpoint Chiller' || item.parameter === 'Fan Cooling Tower')) {
+                logsheetData[i].unit1 = item.unit1;
+                logsheetData[i].unit2 = item.unit2;
+                logsheetData[i].unit3 = item.unit3;
             }
         });
+        populateLogsheetTable(); saveDataToStorage();
+        showNotification('Data dari hari sebelumnya berhasil disalin','success');
+    } catch(e) { showNotification('Error saat copy data','error'); }
+}
+
+function backupAllData() {
+    const all = {};
+    Object.keys(localStorage).filter(k=>k.startsWith('logsheet_chiller_')).forEach(k => all[k]=localStorage.getItem(k));
+    Object.keys(localStorage).filter(k=>k.startsWith('staff_data_')).forEach(k => all[k]=localStorage.getItem(k));
+    const blob = new Blob([JSON.stringify({version:'2.0', timestamp:new Date().toISOString(), data:all},null,2)], {type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `Backup_Logsheet_${new Date().toISOString().slice(0,10)}.json`; a.click(); a.remove();
+    showNotification('Backup berhasil','success');
+}
+
+function importBackupData() {
+    const input = document.createElement('input'); input.type='file'; input.accept='.json';
+    input.onchange = e => {
+        const f = e.target.files[0]; if (!f) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            try {
+                const backup = JSON.parse(ev.target.result);
+                if (backup.data) {
+                    Object.keys(backup.data).forEach(k => localStorage.setItem(k, backup.data[k]));
+                    showNotification('Import backup berhasil','success');
+                    // reload current date
+                    const d = document.getElementById('dateSelect').value;
+                    loadDataForDate(d); loadStaffData(d);
+                } else showNotification('File backup tidak valid','error');
+            } catch(e){ showNotification('Error membaca file','error'); }
+        };
+        reader.readAsText(f);
+    };
+    input.click();
+}
+
+/* ===========================
+   Print, refresh, modal helpers, form handler
+   =========================== */
+function refreshData(event) {
+    const btn = event ? event.target : null;
+    if (btn) { btn.disabled = true; btn.innerHTML = '🔄 Refreshing...'; }
+    setTimeout(()=> {
+        updateDateTime();
+        populateLogsheetTable();
+        updateStatistics();
+        if (btn) { btn.disabled = false; btn.innerHTML = '🔄 Refresh'; }
+        showNotification('Data berhasil diperbarui!','success');
+    }, 600);
+}
+
+function printLogsheet(){ window.print(); }
+function inputData(){ document.getElementById('inputModal').classList.remove('hidden'); }
+function closeInputModal(){ document.getElementById('inputModal').classList.add('hidden'); document.getElementById('inputForm').reset(); }
+function closeQuickInputModal(){ document.getElementById('quickInputModal').classList.add('hidden'); }
+
+/* Input modal submit */
+const inputForm = document.getElementById('inputForm');
+if (inputForm) {
+    inputForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        const paramNo = document.getElementById('parameterSelect').value;
+        const unit = document.getElementById('unitInput').value;
+        const time = document.getElementById('timeInput').value;
+        const raw = document.getElementById('valueInput').value;
+        const value = raw === '' ? '' : parseFloat(raw);
+        if (paramNo && unit && time && raw !== '') {
+            const item = logsheetData.find(i => i.no == paramNo);
+            if (item) {
+                item[unit][time] = value;
+                populateLogsheetTable(); updateStatistics(); saveDataToStorage(); closeInputModal();
+                showNotification('Data berhasil disimpan!', 'success');
+            }
+        } else showNotification('Mohon lengkapi semua field!', 'error');
+    });
+}
+
+/* ===========================
+   Init: when DOM loaded
+   - populate parameter select
+   - load selected date's data
+   =========================== */
+function initializeLogsheet() {
+    populateParameterSelect();
+    const dateInput = document.getElementById('dateSelect');
+    const selectedDate = dateInput && dateInput.value ? dateInput.value : (new Date().toISOString().slice(0,10));
+    // Ensure date picker shows selected
+    if (dateInput) dateInput.value = selectedDate;
+    loadStaffData(selectedDate);
+    loadDataForDate(selectedDate);
+    loadLastSaveTime();
+    updateDateTime();
+    updateStatistics();
+}
+window.addEventListener('DOMContentLoaded', initializeLogsheet);
+</script>
 
         // Show notification
         function showNotification(message, type) {
@@ -1746,6 +1477,7 @@ function exportMonthlyLogsheet() {
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'974e69cb204cf46d',t:'MTc1NjE1OTc2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
+
 
 
 
