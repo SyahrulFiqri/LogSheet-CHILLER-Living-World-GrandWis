@@ -544,31 +544,41 @@ function generateUnitCells(unitData, range, unit, unitKey, rowNo) {
   }).join('');
 }
 
-/* ===========================
-   Populate main logsheet table
-   =========================== */
 function populateLogsheetTable() {
-  const tbody = document.getElementById('logsheetTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
+    const tbody = document.getElementById('logsheetTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-  logsheetData.forEach(item => {
-    const isSection = item.section && (item.description === item.section);
-    const tr = document.createElement('tr');
-    if (isSection) tr.className = 'section-header';
+    logsheetData.forEach(item => {
+        const tr = document.createElement('tr');
+        const isSection = item.section && item.description === item.section;
+        if (isSection) tr.className = 'bg-gray-100 font-semibold';
 
-    tr.innerHTML = `
-      <td class="border border-gray-300 p-2 text-center">${item.no}</td>
-      <td class="border border-gray-300 p-2 ${isSection ? 'font-bold' : ''}">${item.description || ''}</td>
-      <td class="border border-gray-300 p-2">${item.parameter || ''}</td>
-      <td class="border border-gray-300 p-2 text-center">${item.unit || ''}</td>
-      ${generateUnitCells(item.unit1, item.range, item.unit, 'unit1', item.no)}
-      ${generateUnitCells(item.unit2, item.range, item.unit, 'unit2', item.no)}
-      ${generateUnitCells(item.unit3, item.range, item.unit, 'unit3', item.no)}
-      <td class="border border-gray-300 p-2 text-center text-xs"></td>
-    `;
-    tbody.appendChild(tr);
-  });
+        const noTd = `<td class="border border-gray-300 p-2 text-center">${item.no}</td>`;
+        const descTd = `<td class="border border-gray-300 p-2">${item.description || ''}</td>`;
+        const paramTd = `<td class="border border-gray-300 p-2">${item.parameter || ''}</td>`;
+        const unitTd = `<td class="border border-gray-300 p-2 text-center">${item.unit || ''}</td>`;
+
+        const times = ['0930', '1200', '1500', '1800', '2100'];
+        function unitCells(unitKey) {
+            return times.map(t => {
+                const value = item[unitKey]?.[t] ?? '';
+                return `
+                    <td class="border border-gray-300 p-1 text-center">
+                        <input type="number" step="0.1" 
+                            value="${value}"
+                            onchange="updateValue(${item.no}, '${unitKey}', '${t}', this.value)"
+                            class="w-16 text-center border rounded px-1 py-0.5 text-xs">
+                    </td>`;
+            }).join('');
+        }
+
+        tr.innerHTML = noTd + descTd + paramTd + unitTd +
+                       unitCells('unit1') + unitCells('unit2') + unitCells('unit3') +
+                       `<td class="border border-gray-300 p-2 text-center text-xs"></td>`;
+
+        tbody.appendChild(tr);
+    });
 }
 
 /* ===========================
@@ -1106,3 +1116,4 @@ setInterval(() => {
   }
 }, 30000);
 </script>
+
