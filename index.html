@@ -635,6 +635,69 @@
               unit2: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' },
               unit3: { '0930': '', '1200': '', '1500': '', '1800': '', '2100': '' } }
         ];
+        // ==================== POPULATE LOGSHEET TABLE ====================
+function populateLogsheetTable() {
+    const tbody = document.getElementById('logsheetTableBody');
+    tbody.innerHTML = ""; // Bersihkan isi tabel sebelumnya
+
+    logsheetData.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.className = "border-b hover:bg-gray-50";
+
+        row.innerHTML = `
+            <td class="border px-2 py-1 text-center">${item.no}</td>
+            <td class="border px-2 py-1">${item.parameter}</td>
+            <td class="border px-2 py-1 text-center">${item.unit}</td>
+            <td class="border px-2 py-1 text-center">${item.range}</td>
+
+            ${["0930", "1200", "1500", "1800", "2100"].map(time => `
+                <td class="border px-2 py-1 text-center">
+                    <input 
+                        type="number" 
+                        step="0.1" 
+                        value="${item.unit1[time] ?? ''}" 
+                        onchange="updateValue(${index}, 'unit1', '${time}', this.value)"
+                        class="w-16 text-center border rounded px-1 py-0.5 text-xs"
+                    >
+                </td>
+                <td class="border px-2 py-1 text-center">
+                    <input 
+                        type="number" 
+                        step="0.1" 
+                        value="${item.unit2[time] ?? ''}" 
+                        onchange="updateValue(${index}, 'unit2', '${time}', this.value)"
+                        class="w-16 text-center border rounded px-1 py-0.5 text-xs"
+                    >
+                </td>
+                <td class="border px-2 py-1 text-center">
+                    <input 
+                        type="number" 
+                        step="0.1" 
+                        value="${item.unit3[time] ?? ''}" 
+                        onchange="updateValue(${index}, 'unit3', '${time}', this.value)"
+                        class="w-16 text-center border rounded px-1 py-0.5 text-xs"
+                    >
+                </td>
+            `).join('')}
+        `;
+
+        tbody.appendChild(row);
+    });
+}
+
+// ==================== UPDATE VALUE FUNCTION ====================
+function updateValue(index, unit, time, value) {
+    logsheetData[index][unit][time] = value;
+    saveDataToLocal();
+}
+
+// Simpan data ke localStorage
+function saveDataToLocal() {
+    const date = document.getElementById('dateSelect').value;
+    localStorage.setItem(`logsheet_chiller_${date}`, JSON.stringify(logsheetData));
+    document.getElementById('lastSaveTime').textContent = new Date().toLocaleTimeString();
+}
+
 
         // Staff data for signature tracking
         let staffData = {
@@ -1683,5 +1746,6 @@ function exportMonthlyLogsheet() {
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'974e69cb204cf46d',t:'MTc1NjE1OTc2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
+
 
 
