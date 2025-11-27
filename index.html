@@ -445,51 +445,225 @@
     </div>
 
     <script>
-/* ===========================
-  /* ===========================
-   LOGSHEET DATA (clean + valid)
-   =========================== */
-
+/* LOGSHEET DATA (clean — 52 parameter, struktur valid)
+   Paste this *in place of* your broken `const logsheetData = [...]` */
 const logsheetData = [
 
-    // Condenser Status (1–5)
-    { no: 1, section: 'Condenser status', description: 'Condenser status', parameter: 'Water In Temp.', unit: '°C', range: '27-31°C',
-      unit1: { '0930': 29.7, '1200': 29.4, '1500': '', '1800': '', '2100': '' },
-      unit2: { '0930': 29.8, '1200': 29.4, '1500': '', '1800': '', '2100': '' },
-      unit3: { '0930': 29.7, '1200': 29.4, '1500': '', '1800': '', '2100': '' } },
+  /* CONDENSER STATUS 1-5 */
+  { no: 1, section: 'Condenser Status', description: 'Water In Temp.', parameter: 'Water In Temp.', unit: '°C', range: '27-31°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
 
-    { no: 2, section: '', description: '', parameter: 'Water Out Temp.', unit: '°C', range: '32-36°C',
-      unit1: { '0930': 34.4, '1200': 35.1, '1500': '', '1800': '', '2100': '' },
-      unit2: { '0930': 34.4, '1200': 34.6, '1500': '', '1800': '', '2100': '' },
-      unit3: { '0930': 34.4, '1200': 34.9, '1500': '', '1800': '', '2100': '' } },
+  { no: 2, section: 'Condenser Status', description: 'Water Out Temp.', parameter: 'Water Out Temp.', unit: '°C', range: '32-36°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
 
-    { no: 3, section: '', description: '', parameter: 'Condenser Approach', unit: '°C', range: '<3.3°C',
-      unit1: { '0930': 1.7, '1200': 1.6, '1500': '', '1800': '', '2100': '' },
-      unit2: { '0930': 1.3, '1200': 1.0, '1500': '', '1800': '', '2100': '' },
-      unit3: { '0930': 0.8, '1200': 0.5, '1500': '', '1800': '', '2100': '' } },
+  { no: 3, section: 'Condenser Status', description: 'Condenser Approach', parameter: 'Condenser Approach', unit: '°C', range: '<3.3°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
 
-    { no: 4, section: '', description: '', parameter: 'Condenser Pressure', unit: 'Kpa', range: 'Low: >-30 kPa, High: <187 kPa',
-      unit1: { '0930': 88.2, '1200': 89.9, '1500': '', '1800': '', '2100': '' },
-      unit2: { '0930': 84.2, '1200': 84.2, '1500': '', '1800': '', '2100': '' },
-      unit3: { '0930': 81.7, '1200': 82.9, '1500': '', '1800': '', '2100': '' } },
+  { no: 4, section: 'Condenser Status', description: 'Condenser Pressure', parameter: 'Condenser Pressure', unit: 'kPa', range: 'Low: >-30 kPa | High: <187 kPa',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
 
-    { no: 5, section: '', description: '', parameter: 'Condenser Saturated Temp.', unit: '°C', range: '30-36°C',
-      unit1: { '0930': 36.3, '1200': 36.6, '1500': '', '1800': '', '2100': '' },
-      unit2: { '0930': 35.6, '1200': 35.6, '1500': '', '1800': '', '2100': '' },
-      unit3: { '0930': 35.2, '1200': 35.4, '1500': '', '1800': '', '2100': '' } },
+  { no: 5, section: 'Condenser Status', description: 'Condenser Saturated Temp.', parameter: 'Condenser Saturated Temp.', unit: '°C', range: '30-36°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
 
-    // Evaporator Status (9–14)
-    { no: 9, section: 'Evaporator Status', description: 'Evaporator Status', parameter: 'Water In Temp.', unit: '°C', range: '10-13°C',
-      unit1: { '0930': 18.2, '1200': 14.0, '1500': '', '1800': '', '2100': '' },
-      unit2: { '0930': 18.0, '1200': 14.0, '1500': '', '1800': '', '2100': '' },
-      unit3: { '0930': 17.7, '1200': 13.9, '1500': '', '1800': '', '2100': '' } },
+  /* EVAPORATOR STATUS 6-11 (ke Excel kamu sebut 9-14; di sini kita pakai 6..11 sequential) */
+  { no: 6, section: 'Evaporator Status', description: 'Water In Temp.', parameter: 'Water In Temp.', unit: '°C', range: '10-13°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
 
-    { no: 10, section: '', description: '', parameter: 'Water Out Temp.', unit: '°C', range: '6-10°C',
-      unit1: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' },
-      unit2: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' },
-      unit3: { '0930': 12.4, '1200': 7.9, '1500': '', '1800': '', '2100': '' } },
+  { no: 7, section: 'Evaporator Status', description: 'Water Out Temp.', parameter: 'Water Out Temp.', unit: '°C', range: '6-10°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
 
-    // ... lanjutkan sama persis seperti data yang sudah kamu punya sebelumnya
+  { no: 8, section: 'Evaporator Status', description: 'Evaporator Approach', parameter: 'Evaporator Approach', unit: '°C', range: '<2.2°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 9, section: 'Evaporator Status', description: 'Evaporator Pressure', parameter: 'Evaporator Pressure', unit: 'kPa', range: 'Low: >-47 kPa | High: <187 kPa',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 10, section: 'Evaporator Status', description: 'Evap Saturated Refrig Temp', parameter: 'Evap Saturated Refrig Temp', unit: '°C', range: 'Low: >2.2°C | High: <15°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 11, section: 'Evaporator Status', description: 'Evap Refrig Liquid Temp.', parameter: 'Evap Refrig Liquid Temp.', unit: '°C', range: '7-10°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  /* COMPRESSOR STATUS 12-17 */
+  { no: 12, section: 'Compressor Status', description: 'Compressor Running Hour', parameter: 'Compressor Running Hour', unit: 'Hours', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 13, section: 'Compressor Status', description: 'Compressor Starts Number', parameter: 'Compressor Starts Number', unit: '', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 14, section: 'Compressor Status', description: 'Comp. Discharge Temp.', parameter: 'Comp. Discharge Temp.', unit: '°C', range: '<50°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 15, section: 'Compressor Status', description: 'Discharge Superheat', parameter: 'Discharge Superheat', unit: '°C', range: '<8°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 16, section: 'Compressor Status', description: 'Actual GV1 Position', parameter: 'Actual GV1 Position', unit: '%', range: '0-93',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 17, section: 'Compressor Status', description: 'Actual GV2 Position', parameter: 'Actual GV2 Position', unit: '%', range: '0-93',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  /* MOTOR STATUS 18-21 (matching your screenshot numbering shift) */
+  { no: 18, section: 'Motor Status', description: 'Motor Kilowatts', parameter: 'Motor Kilowatts', unit: 'KW', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 19, section: 'Motor Status', description: 'Motor current', parameter: 'Motor current', unit: 'AMPS', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 20, section: 'Motor Status', description: 'Percent Load Current', parameter: 'Percent Load Current', unit: '%', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 21, section: 'Motor Status', description: 'Motor Winding 1 temp', parameter: 'Motor Winding 1 temp', unit: '°C', range: '<100°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  /* VFD STATUS 22-26 */
+  { no: 22, section: 'VFD Status', description: 'Actual Line Voltage', parameter: 'Actual Line Voltage', unit: 'Volts', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 23, section: 'VFD Status', description: 'Actual Vfd Freq', parameter: 'Actual Vfd Freq', unit: 'Hz', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 24, section: 'VFD Status', description: 'Actual Vfd Speed', parameter: 'Actual Vfd Speed', unit: '%', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 25, section: 'VFD Status', description: 'Actual Line Current', parameter: 'Actual Line Current', unit: 'AMPS', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 26, section: 'VFD Status', description: 'Vfd Load Current', parameter: 'Vfd Load Current', unit: 'AMPS', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''},
+    unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  /* PURGE & LUBRICATION 27-38 */
+  { no: 27, section: 'Purge Syst.', description: 'Total Pumpout Number', parameter: 'Total Pumpout Number', unit: '', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 28, section: 'Purge Syst.', description: 'Purge Comp. Suction Temp.', parameter: 'Purge Comp. Suction Temp.', unit: '°C', range: '-25-30°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 29, section: 'Purge Syst.', description: 'Purge Inlet Temp.', parameter: 'Purge Inlet Temp.', unit: '°C', range: '<38°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 30, section: 'Lubrication', description: 'Bearing Ref. Suplay Sat. Temp.', parameter: 'Bearing Ref. Suplay Sat. Temp.', unit: '°C', range: '30-60°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 31, section: 'Lubrication', description: '1st Stage Bearing Temp.', parameter: '1st Stage Bearing Temp.', unit: '°C', range: '40-50°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 32, section: 'Lubrication', description: '2nd Stage Bearing Temp.', parameter: '2nd Stage Bearing Temp.', unit: '°C', range: '40-50°C',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 33, section: 'Lubrication', description: 'Bearing Inlet Pressure', parameter: 'Bearing Inlet Pressure', unit: 'kPa', range: '60-180 kPa',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 34, section: 'Lubrication', description: 'Bearing Outlet pressure', parameter: 'Bearing Outlet pressure', unit: 'kPa', range: '3 - (-40) kPa',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 35, section: 'Lubrication', description: 'Pump Inlet Pressure', parameter: 'Pump Inlet Pressure', unit: 'kPa', range: '>80 kPa',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 36, section: 'Lubrication', description: 'Pump Outlet Pressure', parameter: 'Pump Outlet Pressure', unit: 'kPa', range: '>100 kPa',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 37, section: 'Lubrication', description: 'Ref Pump Amps', parameter: 'Ref Pump Amps', unit: 'Amps', range: '1.0-3.0',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  /* RUNNING STATUS 38-52 (rest) */
+  { no: 38, section: 'Running Status', description: 'Setpoint Chiller', parameter: 'Setpoint Chiller', unit: '°C', range: 'Actual',
+    unit1: {'0930':'8.0','1200':'8.0','1500':'8.0','1800':'8.0','2100':'8.0'}, unit2: {'0930':'8.0','1200':'8.0','1500':'8.0','1800':'8.0','2100':'8.0'}, unit3: {'0930':'8.0','1200':'8.0','1500':'8.0','1800':'8.0','2100':'8.0'} },
+
+  { no: 39, section: 'Running Status', description: 'Fan Cooling Tower', parameter: 'Fan Cooling Tower', unit: 'Unit', range: 'Actual',
+    unit1: {'0930':'4','1200':'4','1500':'4','1800':'4','2100':'4'}, unit2: {'0930':'4','1200':'4','1500':'4','1800':'4','2100':'4'}, unit3: {'0930':'4','1200':'4','1500':'4','1800':'4','2100':'4'} },
+
+  { no: 40, section: 'Running Status', description: 'Freq CWP', parameter: 'Freq CWP', unit: 'Hz', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 41, section: 'Running Status', description: 'Freq CHWP', parameter: 'Freq CHWP', unit: 'Hz', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 42, section: 'Running Status', description: 'Doshing Pump CT', parameter: 'Doshing Pump CT', unit: 'Unit', range: 'Actual',
+    unit1: {'0930':'1','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'1','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'1','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 43, section: 'Running Status', description: 'Doshing Pump Chiller', parameter: 'Doshing Pump Chiller', unit: 'Unit', range: 'Actual',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  /* filler placeholders if you want exact 52 numbered items: */
+  { no: 44, section: 'Additional', description: 'Cooling Tower Sump Temp.', parameter: 'Cooling Tower Sump Temp.', unit: '°C', range: '',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 45, section: 'Additional', description: 'Cooling Tower Conductivity', parameter: 'Conductivity', unit: 'µS/cm', range: '',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 46, section: 'Additional', description: 'Pump Vibration', parameter: 'Pump Vibration', unit: 'mm/s', range: '',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 47, section: 'Additional', description: 'Ambient Temp.', parameter: 'Ambient Temp.', unit: '°C', range: '',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 48, section: 'Additional', description: 'Ambient RH', parameter: 'Ambient RH', unit: '%', range: '',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 49, section: 'Additional', description: 'Total Power', parameter: 'Total Power', unit: 'kW', range: '',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 50, section: 'Additional', description: 'Energy Consumption', parameter: 'Energy Consumption', unit: 'kWh', range: '',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 51, section: 'Additional', description: 'Remarks', parameter: 'Remarks', unit: '', range: '',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} },
+
+  { no: 52, section: 'Additional', description: 'Notes', parameter: 'Notes', unit: '', range: '',
+    unit1: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit2: {'0930':'','1200':'','1500':'','1800':'','2100':''}, unit3: {'0930':'','1200':'','1500':'','1800':'','2100':''} }
 
 ];
 
@@ -1152,6 +1326,7 @@ setInterval(() => {
   }
 }, 30000);
 </script>
+
 
 
 
